@@ -1,14 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState } from "react";
-
-/** Shape of the Strapi users-permissions user returned by POST /api/auth/local. */
-export type User = {
-  id: number;
-  documentId: string;
-  username: string;
-  email: string;
-};
+import type { User } from "@/types/models";
 
 type AuthContextValue = {
   user: User | null;
