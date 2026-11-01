@@ -1,0 +1,53 @@
+{
+  "kind": "collectionType",
+  "collectionName": "discussions",
+  "info": {
+    "singularName": "discussion",
+    "pluralName": "discussions",
+    "displayName": "Discussion"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "minLength": 10,
+      "maxLength": 150,
+      "required": true
+    },
+    "content": {
+      "type": "text",
+      "required": true
+    },
+    "type": {
+      "type": "enumeration",
+      "required": true,
+      "default": "question",
+      "enum": [
+        "question",
+        "discussion"
+      ]
+    },
+    "author": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::users-permissions.user",
+      "required": true
+    },
+    "category": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::category.category",
+      "required": true,
+      "inversedBy": "discussions"
+    },
+    "replies": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::reply.reply",
+      "mappedBy": "discussion"
+    }
+  }
+}
