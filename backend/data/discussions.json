@@ -1,0 +1,66 @@
+[
+  {
+    "title": "Ouvrir un PEA avec 5 000 € : par où commencer ?",
+    "content": "Je viens d'ouvrir un PEA en ligne et j'ai 5 000 € à y placer. Je ne connais pas grand-chose aux actions.\n\nVaut-il mieux tout investir d'un coup ou étaler ? Et sur quoi : des ETF, quelques actions ?",
+    "type": "question",
+    "category": "bourse",
+    "author": 0,
+    "daysAgo": 2
+  },
+  {
+    "title": "J'ai 25 ans et 10 000 € de côté : je fais quoi ?",
+    "content": "Premier CDI depuis un an, j'ai réussi à mettre 10 000 € de côté sur un livret. Pas de projet immobilier avant quatre ou cinq ans.\n\nJe me sens un peu perdu entre PEA, assurance-vie, PER…",
+    "type": "question",
+    "category": "epargne",
+    "author": 2,
+    "daysAgo": 1
+  },
+  {
+    "title": "Assurance-vie après 70 ans : est-ce encore intéressant ?",
+    "content": "J'ai 71 ans et je me demande s'il est encore utile de verser sur une assurance-vie, notamment pour la transmission à mes petits-enfants.",
+    "type": "question",
+    "category": "assurance-vie",
+    "author": 1,
+    "daysAgo": 4
+  },
+  {
+    "title": "SCPI : vous avez renforcé ces derniers mois ou vous attendez ?",
+    "content": "Après les baisses de prix de parts de certaines SCPI, je vois deux écoles autour de moi : ceux qui en profitent pour renforcer et ceux qui ne veulent plus en entendre parler.\n\nEt vous ?",
+    "type": "discussion",
+    "category": "immobilier",
+    "author": 3,
+    "daysAgo": 3
+  },
+  {
+    "title": "Frais réels ou abattement de 10 % : comment choisir ?",
+    "content": "Je fais 35 km aller-retour par jour en voiture pour aller travailler. Est-ce que je devrais passer aux frais réels ?",
+    "type": "question",
+    "category": "impots",
+    "author": 2,
+    "daysAgo": 6
+  },
+  {
+    "title": "PER : vos retours d'expérience après quelques années ?",
+    "content": "J'ai ouvert un PER il y a trois ans pour la déduction fiscale. Je m'interroge sur les frais et la sortie. Vos retours ?",
+    "type": "discussion",
+    "category": "retraite",
+    "author": 1,
+    "daysAgo": 8
+  },
+  {
+    "title": "Location meublée : micro-BIC ou régime réel ?",
+    "content": "Je loue un studio meublé depuis deux mois. Je ne sais pas quel régime choisir pour ma première déclaration.",
+    "type": "question",
+    "category": "impots",
+    "author": 3,
+    "daysAgo": 0
+  },
+  {
+    "title": "Combien de lignes avez-vous dans votre portefeuille ?",
+    "content": "Par curiosité : je suis à 14 lignes et je me demande si ce n'est pas trop. Comment gérez-vous la diversification sans vous éparpiller ?",
+    "type": "discussion",
+    "category": "bourse",
+    "author": 0,
+    "daysAgo": 5
+  }
+]

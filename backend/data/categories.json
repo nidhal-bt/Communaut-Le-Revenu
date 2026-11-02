@@ -1,0 +1,44 @@
+[
+  {
+    "name": "Bourse & actions",
+    "slug": "bourse",
+    "description": "Actions, ETF, PEA, compte-titres : stratégies et retours d'expérience.",
+    "icon": "candlestick-chart",
+    "color": "#007aff"
+  },
+  {
+    "name": "Épargne & placements",
+    "slug": "epargne",
+    "description": "Livrets, fonds euros, obligations, comptes à terme.",
+    "icon": "piggy-bank",
+    "color": "#34c759"
+  },
+  {
+    "name": "Assurance-vie",
+    "slug": "assurance-vie",
+    "description": "Choisir son contrat, arbitrer, transmettre.",
+    "icon": "umbrella",
+    "color": "#30b0c7"
+  },
+  {
+    "name": "Immobilier & SCPI",
+    "slug": "immobilier",
+    "description": "Résidence principale, locatif, SCPI, crédit immobilier.",
+    "icon": "building",
+    "color": "#ff9500"
+  },
+  {
+    "name": "Impôts & fiscalité",
+    "slug": "impots",
+    "description": "Déclaration, niches fiscales, IFI : payer le juste impôt.",
+    "icon": "receipt",
+    "color": "#5856d6"
+  },
+  {
+    "name": "Retraite",
+    "slug": "retraite",
+    "description": "PER, rachat de trimestres, cumul emploi-retraite.",
+    "icon": "armchair",
+    "color": "#ff2d55"
+  }
+]

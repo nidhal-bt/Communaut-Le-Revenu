@@ -10,6 +10,7 @@
     "db:up": "docker compose up -d --wait",
     "db:down": "docker compose down",
     "db:reset": "docker compose down -v",
+    "seed": "tsx scripts/seed-data.ts",
     "dev": "npm run db:up && strapi develop",
     "develop": "strapi develop",
     "start": "strapi start",
@@ -18,10 +19,10 @@
     "upgrade:dry": "npx @strapi/upgrade latest --dry"
   },
   "dependencies": {
-    "@strapi/database": "5.59.0",
-    "@strapi/plugin-cloud": "5.59.0",
-    "@strapi/plugin-users-permissions": "5.59.0",
-    "@strapi/strapi": "5.59.0",
+    "@strapi/database": "5.60.0",
+    "@strapi/plugin-cloud": "5.60.0",
+    "@strapi/plugin-users-permissions": "5.60.0",
+    "@strapi/strapi": "5.60.0",
     "pg": "8.20.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
@@ -32,6 +33,7 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "tsx": "^4.23.15",
     "typescript": "^5"
   },
   "engines": {
@@ -39,7 +41,7 @@
     "npm": ">=6.0.0"
   },
   "strapi": {
-    "uuid": "b8f73f4e-5c3f-431f-905d-6cc5ee8f2b99",
-    "installId": "2f00d6f2c572f07194a5f99d0673284f9192562bdfa4978ae980e6ec7a0076af"
+    "uuid": "9f68ecd2-9532-4ddd-8c60-00581c6edf01",
+    "installId": "71bedec21182e4824cc789e0c45adf06d280271e05971c6994895eb4ea3d00b4"
   }
 }
