@@ -2,43 +2,301 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-@custom-variant dark (&:is(.dark *));
+/* ---------------------------------------------------------------------------
+   Design tokens derived from ../maquette-communaute-le-revenu.html (repo
+   root), which is the canonical design source. Two layers:
+
+     1. Palette  — the only place a raw colour literal appears.
+     2. Semantic — the roles components reference: shadcn's contract, plus the
+                   roles it does not ship (third text level, success,
+                   subscriber gold, verified blue, avatars, category spaces,
+                   glass bars, hero).
+
+   Components must never name a colour. Reach for a semantic token; if none
+   fits, add one here rather than hard-coding a value in a className.
+
+   Single mode — there is no dark theme.
+   --------------------------------------------------------------------------- */
+
+:root {
+  /* === Palette: brand (charte Le Revenu) =================================== */
+  --rev-red: #eb0f0f; /* logo red; solid fills */
+  --rev-red-hover: #d00d0d;
+  --rev-red-text: #e00b0b; /* darker — holds contrast as text on white */
+  --rev-red-tint: #ffeceb; /* soft chip / badge background */
+  --rev-red-wash: #fff3f2; /* faintest pink surface */
+  --rev-red-wash-2: #fff5f4;
+  --rev-black: #000000;
+  --white: #ffffff;
+
+  /* === Palette: neutrals (macOS gray ramp) ================================ */
+  --gray-50: #f5f5f7;
+  --gray-100: #f2f2f4;
+  --gray-200: #e5e5ea;
+  --gray-300: #c7c7cc;
+  --gray-500: #8e8e93;
+  --gray-600: #6e6e73;
+  --gray-700: #424245;
+  --gray-900: #1d1d1f;
+  --graphite-700: #3a3a3c;
+  --graphite-900: #1c1c1e;
+
+  /* === Palette: alpha neutrals ============================================ */
+  --black-a05: rgb(0 0 0 / 0.05);
+  --black-a07: rgb(0 0 0 / 0.07);
+  --black-a08: rgb(0 0 0 / 0.08);
+  --black-a28: rgb(0 0 0 / 0.28);
+  --white-a72: rgb(255 255 255 / 0.72);
+  --white-a86: rgb(255 255 255 / 0.86);
+
+  /* === Palette: accent hues =============================================== */
+  --green-600: #1a8a4a;
+  --green-tint: #e4f6ea;
+  --gold-500: #c9a032;
+  --blue-600: #0a66d8;
+  --violet-600: #4b48c9;
+  --orange-500: #ff9f0a;
+
+  /* === Palette: shared hue family ========================================= */
+  /* Serves both avatar monograms and category tiles. The maquette kept two
+     separate lists that overlapped (#5856d6 appeared in both), so they are
+     one family here. */
+  --hue-blue: #007aff;
+  --hue-slate: #3d5a80;
+  --hue-green: #34c759;
+  --hue-cyan: #30b0c7;
+  --hue-teal: #0a7f99;
+  --hue-orange: #ff9500;
+  --hue-indigo: #5856d6;
+  --hue-pink: #ff2d55;
+  --hue-purple: #af52de;
+  --hue-mint: #00c7be;
+  --hue-brown: #a2845e;
+  --hue-rust: #c93400;
+  --hue-crimson: #d30f45;
+
+  /* === Semantic: shadcn contract ========================================== */
+  --background: var(--gray-50);
+  --foreground: var(--gray-900);
+  --card: var(--white);
+  --card-foreground: var(--gray-900);
+  --popover: var(--white);
+  --popover-foreground: var(--gray-900);
+  --primary: var(--rev-red);
+  --primary-foreground: var(--white);
+  --secondary: var(--gray-100);
+  --secondary-foreground: var(--gray-900);
+  --muted: var(--gray-100);
+  --muted-foreground: var(--gray-600);
+  --accent: var(--black-a05);
+  --accent-foreground: var(--gray-900);
+  --destructive: var(--rev-red-text);
+  --destructive-foreground: var(--white);
+  --border: var(--black-a07);
+  --input: var(--gray-200);
+  --ring: var(--rev-red);
+  --radius: 14px;
+
+  /* === Semantic: extensions =============================================== */
+
+  /* Text — the maquette has three levels where shadcn ships two. */
+  --foreground-secondary: var(--gray-700);
+
+  /* Surfaces and separators */
+  --secondary-hover: var(--gray-200);
+  --border-strong: var(--gray-300); /* hover borders, control strokes */
+  --accent-strong: var(--black-a08); /* selected nav, stronger tracks */
+  --surface-brand: var(--rev-red-wash); /* pinned rows, help card */
+  --surface-editorial: var(--rev-red-wash-2);
+  --glass: var(--white-a72); /* blurred sticky bars */
+  --glass-strong: var(--white-a86); /* toasts */
+  --overlay: var(--black-a28); /* modal scrim */
+
+  /* Brand beyond the solid fill */
+  --primary-hover: var(--rev-red-hover);
+  --primary-text: var(--rev-red-text); /* red links and icons on white */
+  --primary-soft: var(--rev-red-tint);
+
+  /* Status */
+  --success: var(--green-600);
+  --success-foreground: var(--white);
+  --success-soft: var(--green-tint);
+  --destructive-soft: var(--rev-red-tint);
+
+  /* Member roles and gamification */
+  --points: var(--rev-red-text);
+  --points-soft: var(--rev-red-tint);
+  --editorial: var(--rev-red-text); /* La Rédaction */
+  --editorial-soft: var(--rev-red-wash-2);
+  --subscriber: var(--gold-500); /* reserved for subscriber status */
+  --subscriber-foreground: var(--gray-900);
+  --verified: var(--blue-600); /* verified professional expertise */
+  --blog: var(--violet-600);
+
+  /* Hero block */
+  --hero: var(--graphite-900);
+  --hero-top: var(--graphite-700);
+  --hero-foreground: var(--white);
+
+  /* Logotype : le bloc « LE » est noir pur, pas var(--foreground) */
+  --wordmark-ink: var(--rev-black);
+
+  /* Avatar monograms */
+  --avatar-1: var(--hue-indigo);
+  --avatar-2: var(--hue-teal);
+  --avatar-3: var(--gray-600);
+  --avatar-4: var(--hue-rust);
+  --avatar-5: var(--hue-crimson);
+
+  /* Category spaces — fallbacks until Strapi serves a colour per category */
+  --space-bourse: var(--hue-blue);
+  --space-economie: var(--hue-slate);
+  --space-epargne: var(--hue-green);
+  --space-assurance-vie: var(--hue-cyan);
+  --space-immobilier: var(--hue-orange);
+  --space-impots: var(--hue-indigo);
+  --space-retraite: var(--hue-pink);
+  --space-transmission: var(--hue-purple);
+  --space-alternatifs: var(--hue-mint);
+  --space-budget: var(--gray-500);
+  --space-cafe: var(--hue-brown);
+
+  /* Charts */
+  --chart-1: var(--hue-blue);
+  --chart-2: var(--hue-green);
+  --chart-3: var(--hue-orange);
+  --chart-4: var(--hue-indigo);
+  --chart-5: var(--hue-pink);
+
+  /* Sidebar — the maquette's sidebar is the page background with fill
+     hovers, not a surface of its own. */
+  --sidebar: var(--background);
+  --sidebar-foreground: var(--foreground);
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: var(--primary-foreground);
+  --sidebar-accent: var(--accent);
+  --sidebar-accent-foreground: var(--accent-foreground);
+  --sidebar-border: var(--border);
+  --sidebar-ring: var(--ring);
+
+  /* === Gradients ========================================================== */
+  /* Tailwind has no gradient theme namespace, so these stay plain properties
+     and are surfaced through the @utility rules below. */
+  --gradient-primary: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--primary) 82%, var(--white)),
+    var(--primary)
+  );
+  --gradient-hero:
+    radial-gradient(
+      120% 140% at 100% 0%,
+      color-mix(in srgb, var(--primary) 55%, transparent) 0%,
+      transparent 55%
+    ),
+    linear-gradient(160deg, var(--hero-top), var(--hero));
+  --gradient-progress: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--primary) 60%, var(--orange-500)),
+    var(--primary)
+  );
+}
 
 @theme inline {
+  /* Colours */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
-  --color-ring: var(--ring);
-  --color-input: var(--input);
-  --color-border: var(--border);
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-  --color-card-foreground: var(--card-foreground);
+  --color-foreground-secondary: var(--foreground-secondary);
   --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-text: var(--primary-text);
+  --color-primary-soft: var(--primary-soft);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary-hover: var(--secondary-hover);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent-strong: var(--accent-strong);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-destructive-soft: var(--destructive-soft);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-success-soft: var(--success-soft);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-surface-brand: var(--surface-brand);
+  --color-surface-editorial: var(--surface-editorial);
+  --color-glass: var(--glass);
+  --color-glass-strong: var(--glass-strong);
+  --color-overlay: var(--overlay);
+
+  --color-points: var(--points);
+  --color-points-soft: var(--points-soft);
+  --color-editorial: var(--editorial);
+  --color-editorial-soft: var(--editorial-soft);
+  --color-subscriber: var(--subscriber);
+  --color-subscriber-foreground: var(--subscriber-foreground);
+  --color-verified: var(--verified);
+  --color-blog: var(--blog);
+
+  --color-hero: var(--hero);
+  --color-hero-top: var(--hero-top);
+  --color-hero-foreground: var(--hero-foreground);
+  --color-wordmark-ink: var(--wordmark-ink);
+
+  --color-avatar-1: var(--avatar-1);
+  --color-avatar-2: var(--avatar-2);
+  --color-avatar-3: var(--avatar-3);
+  --color-avatar-4: var(--avatar-4);
+  --color-avatar-5: var(--avatar-5);
+
+  --color-space-bourse: var(--space-bourse);
+  --color-space-economie: var(--space-economie);
+  --color-space-epargne: var(--space-epargne);
+  --color-space-assurance-vie: var(--space-assurance-vie);
+  --color-space-immobilier: var(--space-immobilier);
+  --color-space-impots: var(--space-impots);
+  --color-space-retraite: var(--space-retraite);
+  --color-space-transmission: var(--space-transmission);
+  --color-space-alternatifs: var(--space-alternatifs);
+  --color-space-budget: var(--space-budget);
+  --color-space-cafe: var(--space-cafe);
+
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Typography — system first, matching the maquette's body stack. Inter is
+     the cross-platform fallback; Playfair Display carries the headings. */
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, "SF Pro Text", var(--font-inter),
+    "Helvetica Neue", Arial, sans-serif;
+  --font-heading: var(--font-playfair), "Times New Roman", Georgia, serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Radius — derived from --radius (14px, the maquette's card radius):
+     sm 8.4 / md 11.2 / lg 14 / xl 19.6 / 2xl 25.2px */
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -46,75 +304,45 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* Elevation — six families covering every shadow in the maquette */
+  --shadow-card:
+    0 0 0 0.5px rgb(0 0 0 / 0.03), 0 1px 2px rgb(0 0 0 / 0.05),
+    0 6px 16px -6px rgb(0 0 0 / 0.08);
+  --shadow-float:
+    0 0 0 0.5px rgb(0 0 0 / 0.08), 0 20px 50px -10px rgb(0 0 0 / 0.28);
+  --shadow-lift: 0 1px 2px rgb(0 0 0 / 0.05);
+  --shadow-thumb: 0 1px 3px rgb(0 0 0 / 0.12), 0 0 0 0.5px rgb(0 0 0 / 0.04);
+  --shadow-gloss: inset 0 1px 0 rgb(255 255 255 / 0.22);
+  --shadow-brand: 0 1px 2px color-mix(in srgb, var(--primary) 35%, transparent);
 }
 
-:root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+/* Gradient utilities, so a component never spells out a gradient. */
+@utility bg-gradient-primary {
+  background-image: var(--gradient-primary);
+}
+@utility bg-gradient-hero {
+  background-image: var(--gradient-hero);
+}
+@utility bg-gradient-progress {
+  background-image: var(--gradient-progress);
 }
 
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+/* Per-item tinted surfaces. Set --tile-color inline from data (a category's
+   colour, an avatar's hue); the gloss and direction stay fixed. */
+@utility bg-tile {
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--tile-color) 78%, var(--white)),
+    var(--tile-color)
+  );
+}
+@utility bg-avatar {
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--tile-color) 70%, var(--white)),
+    var(--tile-color)
+  );
 }
 
 @layer base {
