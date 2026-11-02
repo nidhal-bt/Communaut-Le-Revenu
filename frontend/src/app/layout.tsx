@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import { AuthProvider } from "@/lib/auth/auth-context";
+import { SiteBar } from "@/components/layout/site-bar";
 import { Navbar } from "@/components/layout/navbar";
+import { BottomNav } from "@/components/layout/bottom-nav";
 import { SideNav } from "@/components/layout/side-nav";
+import { RightRail } from "@/components/layout/right-rail";
 import "./globals.css";
 
 const inter = Inter({
@@ -30,11 +33,20 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="flex min-h-full flex-col">
         <AuthProvider>
+          <SiteBar />
           <Navbar />
-          <div className="mx-auto flex w-full max-w-[1260px] flex-1 gap-7 px-4 pt-6 pb-24">
+          {/* Grille de la maquette : 212px / contenu / 304px, gouttière 28px.
+              Trois paliers qui ne se recouvrent pas, pour qu'aucune règle n'en
+              écrase une autre :
+                < 768px   une colonne implicite, tout s'empile ;
+                768-1180  deux colonnes, le rail passe sous le contenu ;
+                >= 1181   trois colonnes, l'ordre du DOM suffit à les remplir. */}
+          <div className="mx-auto grid w-full max-w-[1260px] flex-1 items-start gap-7 px-4 pt-6 pb-24 md:max-wide:grid-cols-[212px_minmax(0,1fr)] wide:grid-cols-[212px_minmax(0,1fr)_304px]">
             <SideNav />
-            <main className="min-w-0 flex-1">{children}</main>
+            <main className="min-w-0 md:col-start-2">{children}</main>
+            <RightRail className="md:max-wide:col-start-2" />
           </div>
+          <BottomNav />
         </AuthProvider>
       </body>
     </html>

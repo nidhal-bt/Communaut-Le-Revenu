@@ -105,6 +105,7 @@
   /* Surfaces and separators */
   --secondary-hover: var(--gray-200);
   --border-strong: var(--gray-300); /* hover borders, control strokes */
+  --border-divider: var(--gray-200); /* filets de séparation internes */
   --accent-strong: var(--black-a08); /* selected nav, stronger tracks */
   --surface-brand: var(--rev-red-wash); /* pinned rows, help card */
   --surface-editorial: var(--rev-red-wash-2);
@@ -194,6 +195,10 @@
       transparent 55%
     ),
     linear-gradient(160deg, var(--hero-top), var(--hero));
+  /* Carte d'inscription du rail droit : teinte rouge qui s'efface vers la
+     surface de la carte. */
+  --gradient-join: linear-gradient(180deg, var(--primary-soft), var(--card) 70%);
+
   --gradient-progress: linear-gradient(
     90deg,
     color-mix(in srgb, var(--primary) 60%, var(--orange-500)),
@@ -231,6 +236,7 @@
   --color-success-soft: var(--success-soft);
   --color-border: var(--border);
   --color-border-strong: var(--border-strong);
+  --color-border-divider: var(--border-divider);
   --color-input: var(--input);
   --color-ring: var(--ring);
 
@@ -287,6 +293,12 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
+  /* Breakpoints — la maquette passe à trois colonnes au-delà de 1180px.
+     73.8125rem = 1181px, en rem comme les points de rupture par défaut :
+     Tailwind v4 trie les media queries sur la valeur écrite, donc un
+     breakpoint en px sort avant md: (48rem) et se fait écraser par lui. */
+  --breakpoint-wide: 73.8125rem;
+
   /* Typography — system first, matching the maquette's body stack. Inter is
      the cross-platform fallback; Playfair Display carries the headings. */
   --font-sans:
@@ -326,6 +338,9 @@
 }
 @utility bg-gradient-progress {
   background-image: var(--gradient-progress);
+}
+@utility bg-gradient-join {
+  background-image: var(--gradient-join);
 }
 
 /* Per-item tinted surfaces. Set --tile-color inline from data (a category's

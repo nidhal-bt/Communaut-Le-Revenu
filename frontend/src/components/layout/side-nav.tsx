@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { BookOpen, LayoutGrid, Trophy, House } from "lucide-react";
+import { BookOpen, ExternalLink, LayoutGrid, Trophy, House } from "lucide-react";
+import { SITE_URL } from "@/components/layout/site-bar";
 import { cn } from "@/lib/utils";
 
 /**
@@ -38,5 +39,16 @@ export const SideNav = () => (
         {label}
       </Link>
     ))}
+
+    {/* Pied de rail : le second retour vers le site, comme dans la maquette. */}
+    <a
+      href={SITE_URL}
+      target="_blank"
+      rel="noopener"
+      className="mt-[18px] flex items-center gap-2 border-t px-2.5 pt-3 text-[13px] text-muted-foreground hover:text-primary-text"
+    >
+      Retour sur lerevenu.com
+      <ExternalLink className="ml-auto size-[13px] flex-none" />
+    </a>
   </nav>
 );

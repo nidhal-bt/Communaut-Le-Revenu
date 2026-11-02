@@ -10,8 +10,11 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 
-/** Première étape du parcours d'inscription : la connexion. */
-const BENEFITS = [
+/**
+ * Les avantages mis en avant pour convaincre un visiteur de s'inscrire.
+ * Partagés avec la carte du rail droit, pour que les deux ne divergent pas.
+ */
+export const BENEFITS = [
   "Posez vos questions d'argent aux lecteurs et à la rédaction",
   "Suivez les discussions qui vous concernent",
   "Gagnez des badges en aidant les autres",
