@@ -28,8 +28,14 @@ export type StrapiFetchOptions = {
   signal?: AbortSignal;
 };
 
-/** Lit le corps d'erreur Strapi ; retombe sur le statut HTTP si ce n'est pas du JSON. */
-const toStrapiError = async (response: Response): Promise<StrapiError> => {
+/**
+ * Lit le corps d'erreur Strapi ; retombe sur le statut HTTP si ce n'est pas du
+ * JSON. Exporté pour `auth.ts`, qui lance son `fetch` lui-même : la connexion a
+ * besoin des en-têtes de réponse, que `strapiFetch` ne rend pas.
+ */
+export const toStrapiError = async (
+  response: Response,
+): Promise<StrapiError> => {
   const body = (await response
     .json()
     .catch(() => null)) as StrapiErrorBody | null;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BENEFITS, LoginModal } from "@/components/auth/login-modal";
@@ -15,7 +15,7 @@ import { RailCard } from "./rail-card";
  * Les avantages sont ceux de la modale de connexion : les deux vendent la même
  * chose, autant ne pas les laisser diverger.
  */
-export const JoinCard = () => {
+const JoinCardBody = () => {
   const { isAuth } = useAuth();
   const [loginOpen, setLoginOpen] = useState(false);
 
@@ -55,3 +55,13 @@ export const JoinCard = () => {
     </>
   );
 };
+
+/**
+ * Même raison que le hero : `useAuth` suspend, la carte ne s'affiche que pour
+ * un visiteur, donc le repli vide est l'état final d'un membre.
+ */
+export const JoinCard = () => (
+  <Suspense fallback={null}>
+    <JoinCardBody />
+  </Suspense>
+);

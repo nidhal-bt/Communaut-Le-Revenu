@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useTransition } from "react";
 import { Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,6 +10,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { loginAction } from "@/lib/auth/actions";
+import { useSetUser } from "@/lib/auth/auth-context";
 
 /**
  * Les avantages mis en avant pour convaincre un visiteur de s'inscrire.
@@ -26,11 +29,38 @@ type LoginModalProps = {
 };
 
 export const LoginModal = ({ open, onOpenChange }: LoginModalProps) => {
-  /* Présentationnel : l'appel à POST /api/auth/local et useAuth().setUser
-     viendront ici. Pour l'instant, valider le formulaire ferme la modale. */
+  const setUser = useSetUser();
+  const [error, setError] = useState<string | null>(null);
+  const [pending, startTransition] = useTransition();
+
+  /**
+   * Le formulaire n'est pas contrôlé : `loginAction` lit le `FormData`, pose le
+   * cookie de session côté serveur et renvoie le membre. Le mot de passe ne
+   * part donc jamais du navigateur vers Strapi.
+   *
+   * Appel impératif plutôt que `action={...}` : on a besoin de faire trois
+   * choses du résultat — afficher l'erreur, mettre le contexte à jour, fermer
+   * la modale — et aucune ne demande un effet.
+   */
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    onOpenChange(false);
+
+    const formData = new FormData(event.currentTarget);
+    setError(null);
+
+    startTransition(async () => {
+      const result = await loginAction(formData);
+
+      if ("error" in result) {
+        setError(result.error);
+        return;
+      }
+
+      /* Le serveur vient d'écrire le cookie ; le dire au contexte évite de
+         recharger la page pour que l'en-tête et le fil basculent. */
+      setUser(result.user);
+      onOpenChange(false);
+    });
   };
 
   return (
@@ -121,8 +151,24 @@ export const LoginModal = ({ open, onOpenChange }: LoginModalProps) => {
             />
           </div>
 
-          <Button type="submit" size="lg" className="h-10 w-full">
-            Continuer
+          {/* `role="alert"` : l'échec arrive après l'envoi, un lecteur d'écran
+              doit l'entendre sans avoir à repartir en exploration. */}
+          {error !== null && (
+            <p
+              role="alert"
+              className="rounded-sm bg-destructive-soft px-3 py-2.5 text-[13px] font-medium text-destructive"
+            >
+              {error}
+            </p>
+          )}
+
+          <Button
+            type="submit"
+            size="lg"
+            disabled={pending}
+            className="h-10 w-full"
+          >
+            {pending ? "Connexion…" : "Continuer"}
           </Button>
 
           {/* L'inscription n'existe pas encore : simple libellé, pas de lien. */}

@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth/auth-context";
 
@@ -20,7 +21,7 @@ const STATS = [
   { value: "94 %", label: "des questions résolues" },
 ];
 
-export const Hero = () => {
+const HeroBody = () => {
   const { isAuth } = useAuth();
 
   if (isAuth) {
@@ -65,3 +66,14 @@ export const Hero = () => {
     </section>
   );
 };
+
+/**
+ * `useAuth` suspend le temps de lire le cookie de session, et le hero n'existe
+ * que pour un visiteur : un repli vide est donc exactement ce qu'un membre
+ * verra de toute façon, et le visiteur n'attend que la lecture d'un cookie.
+ */
+export const Hero = () => (
+  <Suspense fallback={null}>
+    <HeroBody />
+  </Suspense>
+);

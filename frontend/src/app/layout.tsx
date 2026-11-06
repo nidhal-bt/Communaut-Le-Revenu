@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import { AuthProvider } from "@/lib/auth/auth-context";
+import { getSessionUser } from "@/lib/auth/session";
 import { SiteBar } from "@/components/layout/site-bar";
 import { Navbar } from "@/components/layout/navbar";
 import { BottomNav } from "@/components/layout/bottom-nav";
@@ -32,7 +33,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${inter.variable} ${playfair.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
-        <AuthProvider>
+        {/* La promesse n'est pas attendue ici : un `await` sur le cookie de
+            session retiendrait tout le layout, `{children}` compris, derrière la
+            requête. Chaque composant qui a besoin du membre la dénoue sous sa
+            propre frontière `<Suspense>`. */}
+        <AuthProvider sessionUser={getSessionUser()}>
           <SiteBar />
           <Navbar />
           {/* Grille de la maquette : 212px / contenu / 304px, gouttière 28px.

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import Link from "next/link";
 import { Bell, Plus, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -44,71 +44,86 @@ const AccountPill = ({ user }: { user: User }) => (
   </button>
 );
 
-export const Navbar = () => {
+/**
+ * Le seul bloc de l'en-tête qui dépend de la session, isolé pour cette raison :
+ * `useAuth` suspend le temps de lire le cookie, et le logotype comme la
+ * recherche n'ont aucune raison d'attendre avec lui.
+ */
+const NavbarActions = () => {
   const { user, isAuth } = useAuth();
   const [loginOpen, setLoginOpen] = useState(false);
 
+  if (isAuth && user) {
+    return (
+      <>
+        <Button size="lg">
+          <Plus />
+          Publier
+        </Button>
+        <button
+          type="button"
+          aria-label="Notifications"
+          className="grid size-9 place-items-center rounded-[9px] text-foreground-secondary hover:bg-accent hover:text-foreground"
+        >
+          <Bell className="size-[18px]" />
+        </button>
+        <AccountPill user={user} />
+      </>
+    );
+  }
+
   return (
     <>
-      <header className="sticky top-0 z-40 border-b bg-glass backdrop-blur-xl backdrop-saturate-[1.8]">
-        <div className="mx-auto flex h-[62px] max-w-[1260px] items-center gap-5 px-4">
-          <Link
-            href="/"
-            aria-label="Le Revenu, accueil de la communauté"
-            className="flex flex-none items-center gap-2.5"
-          >
-            <Wordmark />
-            <span className="h-5 w-px bg-border-strong" />
-            <span className="text-[15px] font-semibold text-foreground-secondary">
-              Communauté
-            </span>
-          </Link>
-
-          {/* Présentationnel : la recherche n'est pas encore branchée. */}
-          <div className="hidden h-9 max-w-[420px] flex-1 items-center gap-2 rounded-[10px] border border-transparent bg-accent px-3 text-sm text-muted-foreground focus-within:border-primary focus-within:bg-card focus-within:ring-3 focus-within:ring-ring/25 min-[860px]:flex">
-            <Search className="size-[18px] flex-none" />
-            <input
-              type="search"
-              aria-label="Rechercher"
-              placeholder="Rechercher une discussion, un sujet…"
-              className="h-full min-w-0 flex-1 bg-transparent text-foreground outline-none placeholder:text-muted-foreground"
-            />
-          </div>
-
-          <div className="ml-auto flex items-center gap-2.5">
-            {isAuth && user ? (
-              <>
-                <Button size="lg">
-                  <Plus />
-                  Publier
-                </Button>
-                <button
-                  type="button"
-                  aria-label="Notifications"
-                  className="grid size-9 place-items-center rounded-[9px] text-foreground-secondary hover:bg-accent hover:text-foreground"
-                >
-                  <Bell className="size-[18px]" />
-                </button>
-                <AccountPill user={user} />
-              </>
-            ) : (
-              <>
-                <Button
-                  variant="ghost"
-                  size="lg"
-                  onClick={() => setLoginOpen(true)}
-                >
-                  Se connecter
-                </Button>
-                <Button size="lg" className="px-4"  onClick={() => setLoginOpen(true)}>
-                  Rejoindre
-                </Button>
-              </>
-            )}
-          </div>
-        </div>
-      </header>
+      <Button variant="ghost" size="lg" onClick={() => setLoginOpen(true)}>
+        Se connecter
+      </Button>
+      <Button size="lg" className="px-4" onClick={() => setLoginOpen(true)}>
+        Rejoindre
+      </Button>
       <LoginModal open={loginOpen} onOpenChange={setLoginOpen} />
     </>
   );
 };
+
+/** Deux pastilles de la hauteur des boutons, pour que rien ne saute. */
+const NavbarActionsSkeleton = () => (
+  <>
+    <span aria-hidden className="h-9 w-[104px] rounded-[10px] bg-accent" />
+    <span aria-hidden className="h-9 w-[88px] rounded-[10px] bg-accent" />
+  </>
+);
+
+export const Navbar = () => (
+  <header className="sticky top-0 z-40 border-b bg-glass backdrop-blur-xl backdrop-saturate-[1.8]">
+    <div className="mx-auto flex h-[62px] max-w-[1260px] items-center gap-5 px-4">
+      <Link
+        href="/"
+        aria-label="Le Revenu, accueil de la communauté"
+        className="flex flex-none items-center gap-2.5"
+      >
+        <Wordmark />
+        <span className="h-5 w-px bg-border-strong" />
+        <span className="text-[15px] font-semibold text-foreground-secondary">
+          Communauté
+        </span>
+      </Link>
+
+      {/* Présentationnel : la recherche n'est pas encore branchée. */}
+      <div className="hidden h-9 max-w-[420px] flex-1 items-center gap-2 rounded-[10px] border border-transparent bg-accent px-3 text-sm text-muted-foreground focus-within:border-primary focus-within:bg-card focus-within:ring-3 focus-within:ring-ring/25 min-[860px]:flex">
+        <Search className="size-[18px] flex-none" />
+        <input
+          type="search"
+          aria-label="Rechercher"
+          placeholder="Rechercher une discussion, un sujet…"
+          className="h-full min-w-0 flex-1 bg-transparent text-foreground outline-none placeholder:text-muted-foreground"
+        />
+      </div>
+
+      <div className="ml-auto flex items-center gap-2.5">
+        <Suspense fallback={<NavbarActionsSkeleton />}>
+          <NavbarActions />
+        </Suspense>
+      </div>
+    </div>
+  </header>
+);
