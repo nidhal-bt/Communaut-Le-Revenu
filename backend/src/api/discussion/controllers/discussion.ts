@@ -1,4 +1,5 @@
 import { Core, factories } from '@strapi/strapi';
+import { attachAuthors, toPublicAuthor } from '../../../utils/attach-authors';
 
 type DiscussionInput = {
   title: string;
@@ -11,6 +12,22 @@ type DiscussionInput = {
 export default factories.createCoreController(
   'api::discussion.discussion',
   ({ strapi }) => ({
+    async find(ctx) {
+      const response = await super.find(ctx);
+
+      await attachAuthors(strapi, 'api::discussion.discussion', response.data);
+
+      return response;
+    },
+
+    async findOne(ctx) {
+      const response = await super.findOne(ctx);
+
+      await attachAuthors(strapi, 'api::discussion.discussion', [response.data]);
+
+      return response;
+    },
+
     async create(ctx) {
       const user = ctx.state.user;
 
@@ -26,6 +43,10 @@ export default factories.createCoreController(
         type,
         category,
         author: user.id,
+        // `replyCount` est `required` : le défaut du schéma ne dispense pas de
+        // l'envoyer, et il n'est jamais lu du client — une discussion naît à
+        // zéro, le lifecycle des réponses s'occupe de la suite.
+        replyCount: 0,
       };
 
       const errors = await validate(strapi, data);
@@ -40,7 +61,9 @@ export default factories.createCoreController(
       });
 
       ctx.status = 201;
-      return { data: discussion };
+      return {
+        data: { ...discussion, author: toPublicAuthor(discussion.author) },
+      };
     },
   }),
 );

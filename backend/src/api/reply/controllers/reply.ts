@@ -1,8 +1,25 @@
 import { factories } from "@strapi/strapi";
+import { attachAuthors, toPublicAuthor } from "../../../utils/attach-authors";
 
 export default factories.createCoreController(
   "api::reply.reply",
   ({ strapi }) => ({
+    async find(ctx) {
+      const response = await super.find(ctx);
+
+      await attachAuthors(strapi, "api::reply.reply", response.data);
+
+      return response;
+    },
+
+    async findOne(ctx) {
+      const response = await super.findOne(ctx);
+
+      await attachAuthors(strapi, "api::reply.reply", [response.data]);
+
+      return response;
+    },
+
     async create(ctx) {
       const user = ctx.state.user;
 
@@ -44,7 +61,7 @@ export default factories.createCoreController(
       });
 
       ctx.status = 201;
-      return { data: reply };
+      return { data: { ...reply, author: toPublicAuthor(reply.author) } };
     },
   }),
 );

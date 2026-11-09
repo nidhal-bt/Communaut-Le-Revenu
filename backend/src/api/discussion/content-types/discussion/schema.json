@@ -30,6 +30,12 @@
         "discussion"
       ]
     },
+    "replyCount": {
+      "type": "integer",
+      "default": 0,
+      "min": 0,
+      "required": true
+    },
     "author": {
       "type": "relation",
       "relation": "oneToOne",
