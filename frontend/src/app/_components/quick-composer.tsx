@@ -10,7 +10,7 @@ import {
 } from "@/lib/discussion-types";
 import { cn } from "@/lib/utils";
 import type { Category, DiscussionType } from "@/types/models";
-import { ComposerModal } from "./composer-modal";
+import { ComposerModal } from "@/components/composer/composer-modal";
 
 /**
  * La barre `.quick` de la maquette : « une seule porte d'entrée pour publier ».

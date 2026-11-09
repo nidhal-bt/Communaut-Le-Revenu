@@ -36,6 +36,8 @@ type ComposerModalProps = {
   onTypeChange: (type: DiscussionType) => void;
   onOpenChange: (open: boolean) => void;
   categories: Category[];
+  /** `documentId` de l'espace présélectionné, quand on publie depuis un espace. */
+  defaultCategory?: string;
 };
 
 export const ComposerModal = ({
@@ -44,6 +46,7 @@ export const ComposerModal = ({
   onTypeChange,
   onOpenChange,
   categories,
+  defaultCategory = "",
 }: ComposerModalProps) => {
   const selected = findDiscussionType(type);
   const hasCategories = categories.length > 0;
@@ -156,7 +159,7 @@ export const ComposerModal = ({
                 id="composer-category"
                 name="category"
                 required
-                defaultValue=""
+                defaultValue={defaultCategory}
                 disabled={!hasCategories}
                 className={cn(FIELD, "h-10")}
               >
