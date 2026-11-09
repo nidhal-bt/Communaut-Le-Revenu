@@ -3,7 +3,7 @@ import { cacheLife, cacheTag } from "next/cache";
 import type { Category, Discussion, Reply } from "@/types/models";
 import type { StrapiCollection } from "@/types/strapi";
 import { strapiFetch } from "./client";
-import { DISCUSSIONS_TAG } from "./tags";
+import { categoryTag } from "./tags";
 
 /**
  * Tous les espaces, triés par nom.
@@ -82,9 +82,9 @@ export const fetchCategoryStats = async (
 ): Promise<CategoryStats> => {
   "use cache";
   cacheLife({ stale: 30, revalidate: 60, expire: 300 });
-  /* Le total « réponses » bouge dès qu'un membre publie : même étiquette que
-     le fil, pour que l'en-tête de l'espace ne reste pas faux une minute. */
-  cacheTag(DISCUSSIONS_TAG);
+  /* Les deux totaux bougent dès qu'un membre publie dans cet espace : même
+     étiquette que son fil, pour que l'en-tête ne reste pas faux une minute. */
+  cacheTag(categoryTag(slug));
 
   try {
     const [discussions, replies] = await Promise.all([

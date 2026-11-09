@@ -55,9 +55,19 @@ export default factories.createCoreController(
         return ctx.badRequest("Validation échouée", { errors });
       }
 
+      /* `discussion.category` est peuplé pour la seule invalidation du cache :
+         l'action qui publie la réponse a besoin du slug de l'espace pour
+         périmer son fil et ses compteurs, et le lire ici évite une seconde
+         requête. */
       const reply = await strapi.documents("api::reply.reply").create({
         data,
-        populate: ["author"],
+        populate: {
+          author: true,
+          discussion: {
+            fields: ["documentId"],
+            populate: { category: { fields: ["slug"] } },
+          },
+        },
       });
 
       ctx.status = 201;

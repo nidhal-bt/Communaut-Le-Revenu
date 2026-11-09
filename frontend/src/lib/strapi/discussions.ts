@@ -4,7 +4,7 @@ import { queryForFeedTab, type FeedTabKey } from "@/lib/feed-tabs";
 import type { Discussion } from "@/types/models";
 import type { StrapiCollection, StrapiSingle } from "@/types/strapi";
 import { StrapiError, strapiFetch } from "./client";
-import { DISCUSSIONS_TAG, discussionTag } from "./tags";
+import { categoryTag, discussionTag, HOME_FEED_TAG } from "./tags";
 
 /** La projection partagée par le fil et la page d'une discussion. */
 const DISCUSSION_FIELDS = [
@@ -46,10 +46,10 @@ export const fetchDiscussions = async (
 ): Promise<Discussion[]> => {
   "use cache";
   cacheLife({ stale: 30, revalidate: 60, expire: 300 });
-  /* L'étiquette grossière : publier une réponse déplace un compteur dans
-     *chaque* entrée du fil, il n'existe pas de découpage plus fin qui reste
-     juste. */
-  cacheTag(DISCUSSIONS_TAG);
+  /* `categorySlug` est déjà ce qui sépare les entrées : sans lui on tient le
+     fil de l'accueil, avec lui celui d'un espace. L'étiquette suit donc la
+     clé, et publier dans un espace ne périme pas le fil des autres. */
+  cacheTag(categorySlug ? categoryTag(categorySlug) : HOME_FEED_TAG);
 
   try {
     const { data } = await strapiFetch<StrapiCollection<Discussion>>(
@@ -73,8 +73,8 @@ export const fetchDiscussions = async (
 /**
  * La lecture mise en cache, qui lève sur n'importe quel statut non-2xx.
  *
- * Étiquetée par document, et jamais avec `DISCUSSIONS_TAG` : une réponse sur
- * une discussion n'a aucune raison de périmer la lecture de toutes les autres.
+ * Étiquetée par document, et jamais avec celle d'un fil : une réponse sur une
+ * discussion n'a aucune raison de périmer la lecture de toutes les autres.
  */
 const readDiscussion = async (documentId: string): Promise<Discussion> => {
   "use cache";

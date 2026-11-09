@@ -6,7 +6,7 @@ import {
   NotAuthenticatedError,
 } from "@/lib/auth/authenticated-fetch";
 import { StrapiError } from "@/lib/strapi/client";
-import { DISCUSSIONS_TAG } from "@/lib/strapi/tags";
+import { categoryTag, HOME_FEED_TAG } from "@/lib/strapi/tags";
 import type { Discussion, DiscussionType } from "@/types/models";
 import type { StrapiSingle } from "@/types/strapi";
 
@@ -110,10 +110,18 @@ export const createDiscussionAction = async (
       },
     );
 
-    /* Une seule étiquette : la discussion vient de naître, aucune lecture mise
-       en cache ne la nomme encore. `DISCUSSIONS_TAG` périme le fil et les
-       compteurs de l'espace, qui viennent tous deux de bouger. */
-    updateTag(DISCUSSIONS_TAG);
+    /* Les deux seules surfaces où la discussion apparaît : le fil de l'accueil
+       et son espace — dont le compteur « discussions » vient aussi de bouger.
+       Sa propre page n'est pas nommée : elle vient de naître, aucune lecture
+       mise en cache ne la connaît. Le contrôleur peuple `category`, le slug
+       est donc là sans seconde requête. */
+    updateTag(HOME_FEED_TAG);
+
+    const slug = data.category?.slug;
+    if (slug) updateTag(categoryTag(slug));
+
+    /* Puis le routeur client, que `updateTag` ne touche pas : sans lui, il
+       rejouerait la charge qu'il détient déjà. */
     refresh();
 
     return { discussion: data };

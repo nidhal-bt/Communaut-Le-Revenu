@@ -6,7 +6,12 @@ import {
   NotAuthenticatedError,
 } from "@/lib/auth/authenticated-fetch";
 import { StrapiError } from "@/lib/strapi/client";
-import { DISCUSSIONS_TAG, discussionTag, repliesTag } from "@/lib/strapi/tags";
+import {
+  categoryTag,
+  discussionTag,
+  HOME_FEED_TAG,
+  repliesTag,
+} from "@/lib/strapi/tags";
 import type { Reply } from "@/types/models";
 import type { StrapiSingle } from "@/types/strapi";
 
@@ -87,11 +92,18 @@ export const createReplyAction = async (
 
     /* `updateTag` et non `revalidateTag` : c'est l'API « lire ce que l'on vient
        d'écrire », réservée aux Server Actions, qui périme sans fenêtre de
-       péremption. Les trois étiquettes le sont par la même publication — le
-       cycle de vie de `reply` vient d'incrémenter `replyCount` en SQL. */
+       péremption. Toutes ces surfaces bougent par la même publication — le
+       cycle de vie de `reply` vient d'incrémenter `replyCount` en SQL, que le
+       fil de l'accueil et celui de l'espace affichent tous deux. */
     updateTag(discussionTag(discussion));
     updateTag(repliesTag(discussion));
-    updateTag(DISCUSSIONS_TAG);
+    updateTag(HOME_FEED_TAG);
+
+    /* Le contrôleur peuple `discussion.category` pour cette seule ligne. Sans
+       lui — un backend pas redémarré — l'espace se répare de lui-même en une
+       minute plutôt que de faire échouer la publication. */
+    const slug = data.discussion?.category?.slug;
+    if (slug) updateTag(categoryTag(slug));
 
     /* Puis le routeur client, que `updateTag` ne touche pas : sans lui, il
        rejouerait la charge qu'il détient déjà. */
