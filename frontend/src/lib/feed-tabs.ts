@@ -78,7 +78,7 @@ export const DEFAULT_FEED_VIEW: FeedView = "comfy";
  * branche sans `userId` ne sert que de filet : mieux vaut le tri par défaut
  * qu'un filtre sur un identifiant absent.
  */
-export const queryForFeedTab = (
+const sortAndFiltersForTab = (
   tab: FeedTabKey,
   userId?: number,
 ): Pick<StrapiQuery, "sort" | "filters"> => {
@@ -110,4 +110,26 @@ export const queryForFeedTab = (
         filters: { replyCount: { $eq: 0 } },
       };
   }
+};
+
+/**
+ * Le fragment de requête d'un onglet, restreint à un espace quand il y en a un.
+ *
+ * Le filtre d'espace se *fusionne* avec celui de l'onglet, il ne le remplace
+ * pas : « Sans réponse » occupe déjà `filters`, et l'écraser rendrait l'onglet
+ * silencieusement inopérant dans un espace.
+ */
+export const queryForFeedTab = (
+  tab: FeedTabKey,
+  userId?: number,
+  categorySlug?: string,
+): Pick<StrapiQuery, "sort" | "filters"> => {
+  const base = sortAndFiltersForTab(tab, userId);
+
+  if (!categorySlug) return base;
+
+  return {
+    ...base,
+    filters: { ...base.filters, category: { slug: { $eq: categorySlug } } },
+  };
 };

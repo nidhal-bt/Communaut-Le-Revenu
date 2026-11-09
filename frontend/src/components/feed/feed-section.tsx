@@ -6,7 +6,9 @@ import { Feed } from "./feed";
 
 type FeedSectionProps = {
   pathname: string;
-  searchParams: PageProps<"/">["searchParams"];
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+  /** Restreint le fil à un espace. Absent sur l'accueil. */
+  categorySlug?: string;
 };
 
 /**
@@ -25,12 +27,13 @@ type FeedSectionProps = {
  * tri par défaut : sans ce garde-fou il recevrait le fil « Récentes » complet
  * sous une URL qui annonce « Pour vous », et aucun onglet du rail ne
  * ressortirait comme sélectionné. `pathname` arrive en prop faute de pouvoir se
- * lire côté serveur, et parce qu'un `"/"` en dur ici tomberait le jour où le
- * fil sert aussi un espace.
+ * lire côté serveur, et c'est aussi ce qui permet de servir un espace : la
+ * redirection doit y revenir, pas retomber sur l'accueil.
  */
 export const FeedSection = async ({
   pathname,
   searchParams,
+  categorySlug,
 }: FeedSectionProps) => {
   const { tab } = await searchParams;
   const feedTab = resolveFeedTab(typeof tab === "string" ? tab : undefined);
@@ -38,7 +41,9 @@ export const FeedSection = async ({
 
   if (isMemberFeedTab(feedTab) && !user) redirect(pathname);
 
-  const discussions = await fetchDiscussions(feedTab, user?.id);
+  const discussions = await fetchDiscussions(feedTab, user?.id, categorySlug);
 
-  return <Feed discussions={discussions} tab={feedTab} />;
+  return (
+    <Feed discussions={discussions} tab={feedTab} category={categorySlug} />
+  );
 };

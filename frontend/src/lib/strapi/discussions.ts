@@ -7,7 +7,8 @@ import { strapiFetch } from "./client";
 const PAGE_SIZE = 20;
 
 /**
- * La première page du fil pour un onglet donné.
+ * La première page du fil pour un onglet donné, éventuellement restreinte à un
+ * espace.
  *
  * `use cache` prend l'argument pour clé : chaque onglet a son entrée. Le profil
  * est volontairement court — une minute avant de réinterroger Strapi — et
@@ -21,6 +22,7 @@ const PAGE_SIZE = 20;
 export const fetchDiscussions = async (
   tab: FeedTabKey,
   userId?: number,
+  categorySlug?: string,
 ): Promise<Discussion[]> => {
   "use cache";
   cacheLife({ stale: 30, revalidate: 60, expire: 300 });
@@ -30,7 +32,7 @@ export const fetchDiscussions = async (
       "/discussions",
       {
         query: {
-          ...queryForFeedTab(tab, userId),
+          ...queryForFeedTab(tab, userId, categorySlug),
           fields: [
             "title",
             "content",
