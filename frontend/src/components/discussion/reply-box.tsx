@@ -1,6 +1,7 @@
 "use client";
 
-import { Suspense, useState, useTransition } from "react";
+import { Suspense, useTransition } from "react";
+import { toast } from "sonner";
 import { Avatar } from "@/components/avatar";
 import { SkeletonBar } from "@/components/layout/right-rail/skeleton-bar";
 import { Button } from "@/components/ui/button";
@@ -33,8 +34,8 @@ export const ReplyBoxSkeleton = () => (
  *
  * Non contrôlée, comme `login-modal.tsx` : l'action lit le `FormData`. Appel
  * impératif plutôt que `action={...}`, parce qu'on fait trois choses du
- * résultat — afficher l'erreur, vider le champ, garder le focus — et aucune ne
- * demande un effet.
+ * résultat — l'annoncer, vider le champ, garder le focus — et aucune ne demande
+ * un effet.
  *
  * Écarté de la maquette : l'enregistrement automatique du brouillon, et l'outil
  * « Mentionner », qui demanderait la recherche de pseudo que le backend
@@ -47,7 +48,6 @@ const ReplyBox = ({
   user: User;
   discussionDocumentId: string;
 }) => {
-  const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -58,19 +58,18 @@ const ReplyBox = ({
     const form = event.currentTarget;
     const formData = new FormData(form);
 
-    setError(null);
-
     startTransition(async () => {
       const result = await createReplyAction(formData);
 
       if ("error" in result) {
-        setError(result.error);
+        toast.error(result.error);
         return;
       }
 
       /* Vidé seulement en cas de succès : un échec doit laisser au membre ce
          qu'il vient d'écrire. */
       form.reset();
+      toast.success("Votre réponse est publiée.");
     });
   };
 
@@ -109,17 +108,6 @@ const ReplyBox = ({
         placeholder="Partagez votre expérience, même partielle…"
         className={cn(FIELD, "min-h-[110px] resize-y py-3 leading-[1.5]")}
       />
-
-      {/* `role="alert"` : l'échec arrive après l'envoi, un lecteur d'écran doit
-          l'entendre sans repartir en exploration. */}
-      {error !== null && (
-        <p
-          role="alert"
-          className="rounded-sm bg-destructive-soft px-3 py-2.5 text-[13px] font-medium text-destructive"
-        >
-          {error}
-        </p>
-      )}
 
       <div className="flex flex-wrap items-center justify-between gap-2.5">
         <span className="text-[12.5px] text-muted-foreground">

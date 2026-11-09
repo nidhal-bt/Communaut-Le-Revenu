@@ -1,9 +1,9 @@
 import { Suspense } from "react";
 import { ExternalLink } from "lucide-react";
 import {
-  ComposeHereButton,
-  ComposeHereButtonSkeleton,
-} from "@/components/category/compose-here-button";
+  PublishButton,
+  PublishButtonSkeleton,
+} from "@/components/composer/publish-button";
 import {
   CategoryStats,
   CategoryStatsSkeleton,
@@ -23,7 +23,9 @@ const ComposeHere = async ({ category }: { category: Category }) => {
   const categories = await fetchCategories();
 
   return (
-    <ComposeHereButton
+    <PublishButton
+      label="Publier ici"
+      className="flex-none"
       categories={categories}
       defaultCategory={category.documentId}
     />
@@ -76,7 +78,7 @@ export const CategoryHeader = ({ category }: { category: Category }) => {
         )}
       </div>
 
-      <Suspense fallback={<ComposeHereButtonSkeleton />}>
+      <Suspense fallback={<PublishButtonSkeleton />}>
         <ComposeHere category={category} />
       </Suspense>
     </section>
@@ -95,6 +97,6 @@ export const CategoryHeaderSkeleton = () => (
       <span className="h-3 w-full max-w-sm rounded-full bg-accent" />
       <span className="h-2.5 w-48 rounded-full bg-accent" />
     </div>
-    <ComposeHereButtonSkeleton />
+    <PublishButtonSkeleton />
   </section>
 );

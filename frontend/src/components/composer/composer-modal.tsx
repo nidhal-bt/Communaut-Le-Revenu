@@ -1,6 +1,8 @@
 "use client";
 
+import { useTransition } from "react";
 import { Shield, X } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -10,6 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { FIELD } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { createDiscussionAction } from "@/lib/discussion-actions";
 import { DISCUSSION_TYPES, findDiscussionType } from "@/lib/discussion-types";
 import { cn } from "@/lib/utils";
 import type { Category, DiscussionType } from "@/types/models";
@@ -22,9 +25,9 @@ import type { Category, DiscussionType } from "@/types/models";
  * mention, les réponses de sondage, le bloc « Lier un article du Revenu » et
  * l'enregistrement automatique du brouillon.
  *
- * La modale ne garde aucun état : le type vient de la barre, qui sait lequel a
- * été cliqué, et les autres champs restent non contrôlés comme dans
- * `login-modal.tsx`. Seul le type est réactif — il décide du titre d'exemple.
+ * Les champs ne sont pas contrôlés, comme dans `login-modal.tsx` : l'action lit
+ * le `FormData`. Le type, lui, vient de la barre, qui sait lequel a été cliqué,
+ * et c'est lui qui décide du titre d'exemple.
  */
 
 type ComposerModalProps = {
@@ -47,15 +50,30 @@ export const ComposerModal = ({
 }: ComposerModalProps) => {
   const selected = findDiscussionType(type);
   const hasCategories = categories.length > 0;
+  const [pending, startTransition] = useTransition();
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    /* Présentationnel : `POST /api/discussions` exige un JWT, et la connexion
-       n'est pas encore branchée (`auth-context` n'en conserve aucun). L'appel
-       viendra ici, une fois `login-modal.tsx` relié à `/api/auth/local`.
-       En attendant, publier vide le formulaire et ferme la modale. */
-    event.currentTarget.reset();
-    onOpenChange(false);
+
+    /* `currentTarget` est remis à null dès que le gestionnaire rend la main :
+       le formulaire est capturé ici pour pouvoir être vidé après l'attente. */
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+
+    startTransition(async () => {
+      const result = await createDiscussionAction(formData);
+
+      if ("error" in result) {
+        /* La modale reste ouverte : l'échec doit laisser au membre ce qu'il
+           vient d'écrire. */
+        toast.error(result.error);
+        return;
+      }
+
+      form.reset();
+      onOpenChange(false);
+      toast.success("Votre publication est en ligne.");
+    });
   };
 
   return (
@@ -181,14 +199,15 @@ export const ComposerModal = ({
                 htmlFor="composer-content"
                 className="text-sm font-semibold"
               >
-                Détails{" "}
-                <span className="font-normal text-muted-foreground">
-                  (facultatif)
-                </span>
+                Détails
               </label>
+              {/* Obligatoire, et non « facultatif » comme l'annonçait la
+                  maquette : le contrôleur refuse un contenu vide
+                  (`backend/src/api/discussion/controllers/discussion.ts`). */}
               <textarea
                 id="composer-content"
                 name="content"
+                required
                 rows={5}
                 placeholder="Votre situation, ce que vous avez déjà envisagé… Plus le contexte est précis, meilleures sont les réponses."
                 className={cn(FIELD, "resize-y py-2.5 leading-normal")}
@@ -210,8 +229,13 @@ export const ComposerModal = ({
           </div>
 
           <div className="flex flex-wrap items-center justify-end gap-2.5 border-t px-[22px] py-3.5">
-            <Button type="submit" size="lg" className="h-10 px-4">
-              Publier
+            <Button
+              type="submit"
+              size="lg"
+              disabled={pending}
+              className="h-10 px-4"
+            >
+              {pending ? "Publication…" : "Publier"}
             </Button>
           </div>
         </form>

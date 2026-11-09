@@ -1,12 +1,13 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, use, useState } from "react";
 import Link from "next/link";
-import { Bell, Plus, Search } from "lucide-react";
+import { Bell, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LoginModal } from "@/components/auth/login-modal";
+import { PublishButton } from "@/components/composer/publish-button";
 import { useAuth } from "@/lib/auth/auth-context";
-import type { User } from "@/types/models";
+import type { Category, User } from "@/types/models";
 
 /**
  * Logotype reconstitué d'après la home de lerevenu.com : un bloc rouge
@@ -48,18 +49,23 @@ const AccountPill = ({ user }: { user: User }) => (
  * Le seul bloc de l'en-tête qui dépend de la session, isolé pour cette raison :
  * `useAuth` suspend le temps de lire le cookie, et le logotype comme la
  * recherche n'ont aucune raison d'attendre avec lui.
+ *
+ * La liste des espaces arrive en promesse et se dénoue ici, sous la même
+ * frontière : le composer en a besoin pour son select, et l'en-tête n'a pas à
+ * attendre deux fois.
  */
-const NavbarActions = () => {
+const NavbarActions = ({
+  categories,
+}: {
+  categories: Promise<Category[]>;
+}) => {
   const { user, isAuth } = useAuth();
   const [loginOpen, setLoginOpen] = useState(false);
 
   if (isAuth && user) {
     return (
       <>
-        <Button size="lg">
-          <Plus />
-          Publier
-        </Button>
+        <PublishButton label="Publier" categories={use(categories)} />
         <button
           type="button"
           aria-label="Notifications"
@@ -93,7 +99,11 @@ const NavbarActionsSkeleton = () => (
   </>
 );
 
-export const Navbar = () => (
+export const Navbar = ({
+  categories,
+}: {
+  categories: Promise<Category[]>;
+}) => (
   <header className="sticky top-0 z-40 border-b bg-glass backdrop-blur-xl backdrop-saturate-[1.8]">
     <div className="mx-auto flex h-[62px] max-w-[1260px] items-center gap-5 px-4">
       <Link
@@ -121,7 +131,7 @@ export const Navbar = () => (
 
       <div className="ml-auto flex items-center gap-2.5">
         <Suspense fallback={<NavbarActionsSkeleton />}>
-          <NavbarActions />
+          <NavbarActions categories={categories} />
         </Suspense>
       </div>
     </div>

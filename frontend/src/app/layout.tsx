@@ -2,11 +2,13 @@ import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import { AuthProvider } from "@/lib/auth/auth-context";
 import { getSessionUser } from "@/lib/auth/session";
+import { fetchCategories } from "@/lib/strapi/categories";
 import { SiteBar } from "@/components/layout/site-bar";
 import { Navbar } from "@/components/layout/navbar";
 import { BottomNav } from "@/components/layout/bottom-nav";
 import { SideNav } from "@/components/layout/side-nav";
 import { RightRail } from "@/components/layout/right-rail";
+import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
 const inter = Inter({
@@ -39,7 +41,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             propre frontière `<Suspense>`. */}
         <AuthProvider sessionUser={getSessionUser()}>
           <SiteBar />
-          <Navbar />
+          {/* Même règle que la session : la promesse n'est pas attendue ici.
+              La lecture est mise en cache sans argument, elle partage donc son
+              entrée avec le rail gauche — l'en-tête ne coûte pas une requête
+              de plus. */}
+          <Navbar categories={fetchCategories()} />
           {/* Grille de la maquette : 212px / contenu / 304px, gouttière 28px.
               Trois paliers qui ne se recouvrent pas, pour qu'aucune règle n'en
               écrase une autre :
@@ -52,6 +58,18 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             <RightRail className="md:max-wide:col-start-2" />
           </div>
           <BottomNav />
+          {/* Monté une seule fois, hors de la grille : toute Server Action
+              annonce son résultat ici.
+
+              Les deux décalages portent la même valeur : la barre du bas est
+              fixée au coin inférieur jusqu'à `md` (768px), alors que sonner
+              bascule sur `mobileOffset` à 600px — un seul des deux laisserait
+              la notification sous la barre entre les deux seuils. */}
+          <Toaster
+            position="bottom-right"
+            offset={{ bottom: 84 }}
+            mobileOffset={{ bottom: 84 }}
+          />
         </AuthProvider>
       </body>
     </html>
