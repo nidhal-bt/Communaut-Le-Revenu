@@ -16,6 +16,19 @@ export type User = {
   email: string;
 };
 
+/**
+ * Auteur tel que le renvoient `find` / `findOne`, et rien de plus.
+ *
+ * Le sanitizer de Strapi retire la relation `author` des réponses publiques ;
+ * les contrôleurs la rattachent eux-mêmes, réduite à ces deux champs (voir
+ * `backend/src/utils/attach-authors.ts`). Ni `id`, ni `email` : ce n'est donc
+ * pas un `User`.
+ */
+export type PublicAuthor = {
+  documentId: string;
+  username: string;
+};
+
 export type DiscussionType = "question" | "discussion";
 
 export type Category = StrapiDocument & {
@@ -37,15 +50,17 @@ export type Discussion = StrapiDocument & {
   title: string;
   content: string;
   type: DiscussionType;
-  /** Relation `oneToOne` : un objet, pas un tableau. */
-  author?: User;
+  /** Dénormalisé par le cycle de vie de `reply` : le compteur affiché par le fil. */
+  replyCount: number;
+  /** Rattaché par le contrôleur. `null` si le compte a été supprimé. */
+  author?: PublicAuthor | null;
   category?: Category;
   replies?: Reply[];
 };
 
 export type Reply = StrapiDocument & {
   content: string;
-  /** Relation `oneToOne` : un objet, pas un tableau. */
-  author?: User;
+  /** Rattaché par le contrôleur. `null` si le compte a été supprimé. */
+  author?: PublicAuthor | null;
   discussion?: Discussion;
 };
