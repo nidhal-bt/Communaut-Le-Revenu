@@ -51,6 +51,9 @@ export const resolveFeedTab = (value: string | undefined): FeedTabKey => {
   return tab ? tab.key : DEFAULT_FEED_TAB;
 };
 
+export const isMemberFeedTab = (key: FeedTabKey): boolean =>
+  FEED_TABS.some((tab) => tab.key === key && tab.memberOnly);
+
 export type FeedView = "comfy" | "compact";
 
 export type FeedViewOption = {
@@ -69,19 +72,42 @@ export const DEFAULT_FEED_VIEW: FeedView = "comfy";
 /**
  * Traduit un onglet en fragment de requête, fusionné par `fetchDiscussions`.
  *
- * Les tris et filtres propres à chaque onglet restent à écrire : « Tendances »
- * trierait sur `replyCount`, « Sans réponse » filtrerait sur `replyCount: 0`.
- * En attendant, tous les onglets partagent la même requête — et c'est ici, et
- * nulle part ailleurs, qu'ils se sépareront.
+ * `userId` n'est lu que par « Pour vous » : les trois autres onglets restent
+ * identiques pour un visiteur et pour un membre. Un visiteur n'atteint jamais
+ * « Pour vous » — `FeedSection` le redirige avant d'appeler ici —, donc la
+ * branche sans `userId` ne sert que de filet : mieux vaut le tri par défaut
+ * qu'un filtre sur un identifiant absent.
  */
 export const queryForFeedTab = (
   tab: FeedTabKey,
+  userId?: number,
 ): Pick<StrapiQuery, "sort" | "filters"> => {
   switch (tab) {
+    /* Les fils où le membre est déjà intervenu. Une seule requête : Strapi
+       traverse la relation `replies` puis son auteur. */
     case "pour-vous":
+      return userId
+        ? {
+            sort: ["createdAt:desc"],
+            filters: { replies: { author: { id: { $eq: userId } } } },
+          }
+        : { sort: ["createdAt:desc"] };
+
+    /* `createdAt` départage : beaucoup de discussions ont zéro ou une réponse,
+       et Postgres ne garantit aucun ordre entre ex æquo. */
     case "tendances":
+      return { sort: ["replyCount:desc", "createdAt:desc"] };
+
     case "recentes":
-    case "sans-reponse":
       return { sort: ["createdAt:desc"] };
+
+    /* `replyCount` est à `null` tant qu'aucune réponse n'a été écrite — le
+       compteur n'est posé qu'au premier incrément. `$eq: 0` seul raterait ces
+       discussions-là, qui sont précisément les plus anciennes sans réponse. */
+    case "sans-reponse":
+      return {
+        sort: ["createdAt:desc"],
+        filters: { replyCount: { $eq: 0 } },
+      };
   }
 };

@@ -2,11 +2,12 @@
 
 import { Suspense } from "react";
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
+import { redirect, usePathname, useSearchParams } from "next/navigation";
 import { useAuth } from "@/lib/auth/auth-context";
 import {
   DEFAULT_FEED_TAB,
   FEED_TABS,
+  isMemberFeedTab,
   resolveFeedTab,
   type FeedTab,
   type FeedTabKey,
@@ -32,8 +33,7 @@ const TabLink = ({ tab, href, selected }: TabLinkProps) => {
   return (
     <Link
       href={href}
-      role="tab"
-      aria-selected={selected}
+      aria-current={selected ? "page" : undefined}
       className={cn(
         "inline-flex items-center gap-[7px] rounded-sm px-3.5 py-1.5 text-sm font-medium whitespace-nowrap text-foreground-secondary transition-[background-color,box-shadow,color] hover:text-foreground",
         selected && cn(SEGMENT_SELECTED, "font-semibold"),
@@ -55,10 +55,17 @@ type MemberTabsProps = {
  * Le seul onglet qui dépend de la session : « Pour vous » suit les centres
  * d'intérêt du membre, il n'a rien à montrer à un visiteur ni dans un espace
  * déjà thématique.
+ *
+ * Le garde-fou double celui de `FeedSection`, et pour une autre raison : là-bas
+ * c'est l'URL tapée à la main qui est rattrapée, ici c'est `isAuth` qui retombe
+ * à faux après coup — une déconnexion ne redemande rien au serveur, elle ne
+ * change que l'état client, et le fil du membre resterait à l'écran sous une URL
+ * devenue invalide.
  */
 const MemberTabs = ({ category, activeTab, hrefFor }: MemberTabsProps) => {
   const { isAuth } = useAuth();
 
+  if (!isAuth && isMemberFeedTab(activeTab)) redirect(hrefFor(DEFAULT_FEED_TAB));
   if (!isAuth || category) return null;
 
   return (
@@ -108,8 +115,7 @@ export const FeedTabs = ({ category }: { category?: string }) => {
   };
 
   return (
-    <div
-      role="tablist"
+    <nav
       aria-label="Tri du fil"
       className={cn(
         "inline-flex max-w-full self-start overflow-x-auto [scrollbar-width:none]",
@@ -132,7 +138,7 @@ export const FeedTabs = ({ category }: { category?: string }) => {
           selected={tab.key === activeTab}
         />
       ))}
-    </div>
+    </nav>
   );
 };
 

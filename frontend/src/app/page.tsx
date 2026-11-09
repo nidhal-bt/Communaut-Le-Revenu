@@ -20,7 +20,7 @@ export default function Home({ searchParams }: PageProps<"/">) {
         <QuickComposerSection />
       </Suspense>
       <Suspense fallback={<FeedSkeleton />}>
-        <FeedSection searchParams={searchParams} />
+        <FeedSection pathname="/" searchParams={searchParams} />
       </Suspense>
     </div>
   );

@@ -20,6 +20,7 @@ const PAGE_SIZE = 20;
  */
 export const fetchDiscussions = async (
   tab: FeedTabKey,
+  userId?: number,
 ): Promise<Discussion[]> => {
   "use cache";
   cacheLife({ stale: 30, revalidate: 60, expire: 300 });
@@ -29,7 +30,7 @@ export const fetchDiscussions = async (
       "/discussions",
       {
         query: {
-          ...queryForFeedTab(tab),
+          ...queryForFeedTab(tab, userId),
           fields: [
             "title",
             "content",
