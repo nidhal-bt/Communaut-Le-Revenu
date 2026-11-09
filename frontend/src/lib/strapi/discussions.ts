@@ -1,8 +1,28 @@
-import { cacheLife } from "next/cache";
+import { cache } from "react";
+import { cacheLife, cacheTag } from "next/cache";
 import { queryForFeedTab, type FeedTabKey } from "@/lib/feed-tabs";
 import type { Discussion } from "@/types/models";
-import type { StrapiCollection } from "@/types/strapi";
-import { strapiFetch } from "./client";
+import type { StrapiCollection, StrapiSingle } from "@/types/strapi";
+import { StrapiError, strapiFetch } from "./client";
+import { DISCUSSIONS_TAG, discussionTag } from "./tags";
+
+/** La projection partagée par le fil et la page d'une discussion. */
+const DISCUSSION_FIELDS = [
+  "title",
+  "content",
+  "type",
+  "replyCount",
+  "createdAt",
+  "updatedAt",
+];
+
+// Le contrôleur rattache `author` lui-même, le sanitizer le retirant de toute
+// façon ; on demande malgré tout la projection voulue, pour que la requête
+// reste juste si cette règle change un jour.
+const DISCUSSION_POPULATE = {
+  author: { fields: ["username"] },
+  category: { fields: ["name", "slug", "icon", "color"] },
+};
 
 const PAGE_SIZE = 20;
 
@@ -26,6 +46,10 @@ export const fetchDiscussions = async (
 ): Promise<Discussion[]> => {
   "use cache";
   cacheLife({ stale: 30, revalidate: 60, expire: 300 });
+  /* L'étiquette grossière : publier une réponse déplace un compteur dans
+     *chaque* entrée du fil, il n'existe pas de découpage plus fin qui reste
+     juste. */
+  cacheTag(DISCUSSIONS_TAG);
 
   try {
     const { data } = await strapiFetch<StrapiCollection<Discussion>>(
@@ -33,21 +57,8 @@ export const fetchDiscussions = async (
       {
         query: {
           ...queryForFeedTab(tab, userId, categorySlug),
-          fields: [
-            "title",
-            "content",
-            "type",
-            "replyCount",
-            "createdAt",
-            "updatedAt",
-          ],
-          // Le contrôleur rattache `author` lui-même, le sanitizer le retirant
-          // de toute façon ; on demande malgré tout la projection voulue, pour
-          // que la requête reste juste si cette règle change un jour.
-          populate: {
-            author: { fields: ["username"] },
-            category: { fields: ["name", "slug", "icon", "color"] },
-          },
+          fields: DISCUSSION_FIELDS,
+          populate: DISCUSSION_POPULATE,
           pagination: { pageSize: PAGE_SIZE },
         },
       },
@@ -58,3 +69,48 @@ export const fetchDiscussions = async (
     return [];
   }
 };
+
+/**
+ * La lecture mise en cache, qui lève sur n'importe quel statut non-2xx.
+ *
+ * Étiquetée par document, et jamais avec `DISCUSSIONS_TAG` : une réponse sur
+ * une discussion n'a aucune raison de périmer la lecture de toutes les autres.
+ */
+const readDiscussion = async (documentId: string): Promise<Discussion> => {
+  "use cache";
+  cacheLife({ stale: 30, revalidate: 60, expire: 300 });
+  cacheTag(discussionTag(documentId));
+
+  const { data } = await strapiFetch<StrapiSingle<Discussion>>(
+    `/discussions/${documentId}`,
+    { query: { fields: DISCUSSION_FIELDS, populate: DISCUSSION_POPULATE } },
+  );
+
+  return data;
+};
+
+/**
+ * Une discussion depuis son `documentId`, ou `null` si elle n'existe pas.
+ *
+ * La mise en cache et la décision du 404 sont séparées exprès. `fetchCategory`
+ * renonce à `use cache` parce qu'il craint de mettre le *négatif* en cache ;
+ * ici le négatif ne l'est jamais : la portée mise en cache lève, et le `null`
+ * est fabriqué dehors, par une fonction sans directive.
+ *
+ * Seul un 404 devient `null`. Tout le reste est relancé : avaler l'erreur
+ * ferait passer un backend éteint pour « cette discussion n'existe pas ».
+ *
+ * `cache` de React dédoublonne les trois lectures d'une même requête —
+ * `generateMetadata`, le fil de discussion et le bloc « À lire aussi ».
+ */
+export const fetchDiscussion = cache(
+  async (documentId: string): Promise<Discussion | null> => {
+    try {
+      return await readDiscussion(documentId);
+    } catch (error) {
+      if (error instanceof StrapiError && error.status === 404) return null;
+
+      throw error;
+    }
+  },
+);

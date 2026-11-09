@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SpaceTile } from "@/components/space-tile";
+import { discussionHref } from "@/lib/discussion-slug";
 import { formatRelativeTime } from "@/lib/relative-time";
 import { cn } from "@/lib/utils";
 import type { Discussion } from "@/types/models";
@@ -29,12 +30,12 @@ export const DiscussionRowHeader = () => (
  * de vues dans le modèle de données.
  */
 export const DiscussionRow = ({ discussion }: { discussion: Discussion }) => {
-  const { documentId, title, type, category, author, updatedAt } = discussion;
+  const { title, type, category, author, updatedAt } = discussion;
   const replyCount = discussion.replyCount ?? 0;
 
   return (
     <Link
-      href={`/discussions/${documentId}`}
+      href={discussionHref(discussion)}
       className={cn(
         ROW_GRID,
         "group border-t border-border-divider py-2.5 transition-colors first:border-t-0 hover:bg-accent",

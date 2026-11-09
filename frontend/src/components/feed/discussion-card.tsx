@@ -1,23 +1,10 @@
 import Link from "next/link";
+import { Avatar } from "@/components/avatar";
 import { SpaceTile } from "@/components/space-tile";
+import { discussionHref } from "@/lib/discussion-slug";
 import { formatRelativeTime, isWithinHours } from "@/lib/relative-time";
 import { cn } from "@/lib/utils";
 import type { Discussion, PublicAuthor } from "@/types/models";
-
-const AVATAR_TINTS = [
-  "bg-avatar-1",
-  "bg-avatar-2",
-  "bg-avatar-3",
-  "bg-avatar-4",
-  "bg-avatar-5",
-];
-
-/** Teinte stable pour un pseudo donné : la même au rendu serveur et client. */
-const tintFor = (username: string) => {
-  const sum = [...username].reduce((total, char) => total + char.charCodeAt(0), 0);
-
-  return AVATAR_TINTS[sum % AVATAR_TINTS.length];
-};
 
 const ReplyCount = ({ count }: { count: number }) => (
   <span
@@ -59,15 +46,7 @@ const Byline = ({
 
   return (
     <span className="inline-flex items-center gap-[7px]">
-      <span
-        aria-hidden
-        className={cn(
-          "grid size-[22px] flex-none place-items-center rounded-full text-[9.5px] font-semibold text-primary-foreground",
-          tintFor(author.username),
-        )}
-      >
-        {author.username.trim().charAt(0).toUpperCase()}
-      </span>
+      <Avatar username={author.username} size="xs" />
       <b className="font-semibold text-foreground-secondary">
         {author.username}
       </b>
@@ -85,14 +64,13 @@ const Byline = ({
  * simplement absents plutôt qu'inventés.
  */
 export const DiscussionCard = ({ discussion }: { discussion: Discussion }) => {
-  const { documentId, title, content, type, category, author, createdAt } =
-    discussion;
+  const { title, content, type, category, author, createdAt } = discussion;
   const replyCount = discussion.replyCount ?? 0;
   const isNew = replyCount === 0 && isWithinHours(createdAt, 6);
 
   return (
     <Link
-      href={`/discussions/${documentId}`}
+      href={discussionHref(discussion)}
       className="group grid grid-cols-[minmax(0,1fr)] gap-2 border-t border-border-divider px-4 py-3.5 transition-colors first:border-t-0 hover:bg-accent md:grid-cols-[62px_minmax(0,1fr)] md:gap-4 md:px-[18px] md:py-4"
     >
       <div className="hidden md:block">

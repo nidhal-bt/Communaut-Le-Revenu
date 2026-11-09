@@ -8,6 +8,7 @@ import {
   DialogContent,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { FIELD } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { DISCUSSION_TYPES, findDiscussionType } from "@/lib/discussion-types";
 import { cn } from "@/lib/utils";
@@ -25,10 +26,6 @@ import type { Category, DiscussionType } from "@/types/models";
  * été cliqué, et les autres champs restent non contrôlés comme dans
  * `login-modal.tsx`. Seul le type est réactif — il décide du titre d'exemple.
  */
-
-/** Recette `.input` de la maquette, pour les contrôles natifs sans équivalent `ui/`. */
-const FIELD =
-  "w-full rounded-sm border bg-card px-3 text-sm outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:opacity-50";
 
 type ComposerModalProps = {
   open: boolean;

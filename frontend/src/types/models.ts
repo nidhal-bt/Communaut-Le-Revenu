@@ -51,7 +51,7 @@ export type Discussion = StrapiDocument & {
   content: string;
   type: DiscussionType;
   /** Dénormalisé par le cycle de vie de `reply` : le compteur affiché par le fil. */
-  replyCount: number;
+  replyCount: number | null;
   /** Rattaché par le contrôleur. `null` si le compte a été supprimé. */
   author?: PublicAuthor | null;
   category?: Category;

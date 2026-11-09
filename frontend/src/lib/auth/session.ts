@@ -95,3 +95,14 @@ export const writeSession = async (session: Session): Promise<void> => {
     maxAge: MAX_AGE,
   });
 };
+
+/**
+ * Suppression de la session. Même contrainte que `writeSession` : hors d'une
+ * Server Action ou d'un Route Handler, Next lève.
+ *
+ * Aucune option à repasser — le cookie a été posé sur `path: "/"`, que
+ * `delete` retrouve seul.
+ */
+export const clearSession = async (): Promise<void> => {
+  (await cookies()).delete(SESSION_COOKIE);
+};

@@ -5,7 +5,7 @@ import { toStrapiError } from "./client";
 import { STRAPI_API_URL } from "./config";
 
 /**
- * `POST /api/auth/local` — le seul appel d'authentification branché.
+ * Les deux appels d'authentification : la connexion et la rotation du jeton.
  *
  * Il ne passe pas par `strapiFetch` pour deux raisons : c'est un POST sans
  * paramètres de requête, et surtout il faut lire les en-têtes de la réponse,
@@ -79,4 +79,45 @@ export const login = async (
       email: user.email,
     },
   };
+};
+
+export type RefreshResponse = {
+  jwt: string;
+  /** Le *nouveau* jeton de rotation, ou `null` si Strapi n'en a pas posé. */
+  refreshToken: string | null;
+};
+
+/**
+ * `POST /api/auth/refresh` — échange le jeton de rotation contre un jeton
+ * d'accès neuf.
+ *
+ * Le jeton part dans le **corps** de la requête, pas dans un en-tête `Cookie`.
+ * Le plugin lit d'abord son cookie puis retombe sur `body.refreshToken`
+ * (`controllers/auth.js`), et depuis Node il n'existe aucun bocal à cookies :
+ * forger l'en-tête serait du travail pour rien.
+ *
+ * On renvoie le jeton de rotation **tel qu'il est revenu**, `null` compris, et
+ * jamais celui qui vient d'être envoyé : la rotation l'invalide sur-le-champ,
+ * donc le conserver laisserait une session d'apparence saine mais incapable de
+ * se rafraîchir une seconde fois.
+ */
+export const refresh = async (
+  refreshToken: string,
+): Promise<RefreshResponse> => {
+  const response = await fetch(`${STRAPI_API_URL}/auth/refresh`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify({ refreshToken }),
+  });
+
+  if (!response.ok) {
+    throw await toStrapiError(response);
+  }
+
+  const { jwt } = (await response.json()) as { jwt: string };
+
+  return { jwt, refreshToken: readRefreshToken(response) };
 };

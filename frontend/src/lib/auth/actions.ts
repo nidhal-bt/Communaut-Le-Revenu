@@ -13,10 +13,10 @@ import { writeSession } from "./session";
  * part du navigateur vers notre serveur, pas vers Strapi, et le jeton n'est
  * jamais exposé au JavaScript de la page.
  *
- * **Déconnexion et rotation du jeton sont à venir.** Le jeton d'accès ne vit
- * que 10 minutes (voir `session.ts`) ; `POST /api/auth/refresh` devra être
- * appelé depuis une action avant la première écriture authentifiée, qui est
- * aussi le premier endroit où le `jwt` stocké servira vraiment.
+ * **La déconnexion est encore à venir.** La rotation du jeton, elle, est
+ * branchée : le jeton d'accès ne vit que 10 minutes (voir `session.ts`), et
+ * `authenticated-fetch.ts` échange le jeton de rotation dès qu'un appel de
+ * membre revient en 401.
  */
 
 export type LoginResult = { user: User } | { error: string };
