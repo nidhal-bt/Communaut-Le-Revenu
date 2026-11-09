@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CategoryIcon } from "@/components/category-icon";
+import { SpaceTile } from "@/components/space-tile";
 import { formatRelativeTime, isWithinHours } from "@/lib/relative-time";
 import { cn } from "@/lib/utils";
 import type { Discussion, PublicAuthor } from "@/types/models";
@@ -103,13 +103,7 @@ export const DiscussionCard = ({ discussion }: { discussion: Discussion }) => {
         <div className="mb-[5px] flex flex-wrap items-center gap-2 text-[12.5px]">
           {category && (
             <span className="inline-flex items-center gap-1.5 font-semibold text-primary-text">
-              <span
-                aria-hidden
-                className="grid size-[18px] flex-none place-items-center rounded-[5px] bg-tile text-primary-foreground shadow-gloss"
-                style={{ "--tile-color": category.color } as React.CSSProperties}
-              >
-                <CategoryIcon icon={category.icon} className="size-[11px]" />
-              </span>
+              <SpaceTile category={category} size={18} />
               {category.name}
             </span>
           )}

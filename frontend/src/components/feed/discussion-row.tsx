@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CategoryIcon } from "@/components/category-icon";
+import { SpaceTile } from "@/components/space-tile";
 import { formatRelativeTime } from "@/lib/relative-time";
 import { cn } from "@/lib/utils";
 import type { Discussion } from "@/types/models";
@@ -41,15 +41,7 @@ export const DiscussionRow = ({ discussion }: { discussion: Discussion }) => {
       )}
     >
       <span className="flex min-w-0 items-center gap-2.5">
-        {category && (
-          <span
-            aria-hidden
-            className="grid size-7 flex-none place-items-center rounded-[7px] bg-tile text-primary-foreground shadow-gloss"
-            style={{ "--tile-color": category.color } as React.CSSProperties}
-          >
-            <CategoryIcon icon={category.icon} className="size-[17px]" />
-          </span>
-        )}
+        {category && <SpaceTile category={category} size={28} />}
 
         <span className="flex min-w-0 flex-col">
           <b className="truncate text-[14.5px] font-semibold group-hover:text-primary-text">
