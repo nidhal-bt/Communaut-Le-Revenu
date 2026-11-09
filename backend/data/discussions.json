@@ -62,5 +62,197 @@
     "category": "bourse",
     "author": 0,
     "daysAgo": 5
+  },
+  {
+    "title": "Combien gardez-vous en épargne de précaution ?",
+    "content": "On lit partout « trois à six mois de dépenses ». Dans la vraie vie, j'ai l'impression que personne n'a le même chiffre.\n\nVous êtes à combien, et qu'est-ce qui a décidé ce montant ?",
+    "type": "discussion",
+    "category": "epargne",
+    "author": 1,
+    "daysAgo": 9
+  },
+  {
+    "title": "ETF ou fonds en euros : comment répartir quand on débute ?",
+    "content": "J'ouvre une assurance-vie avec 8 000 € et des versements mensuels. Le contrat propose les deux, et je n'ai aucune idée de la répartition de départ.\n\nComment avez-vous tranché, vous ?",
+    "type": "question",
+    "category": "bourse",
+    "author": 4,
+    "daysAgo": 7
+  },
+  {
+    "title": "Acheter sa résidence principale ou rester locataire et investir ?",
+    "content": "Le débat revient à chaque repas de famille. J'ai fait le calcul dans mon coin et je n'arrive pas à une réponse nette.\n\nQu'est-ce qui a fait pencher la balance pour vous ?",
+    "type": "discussion",
+    "category": "immobilier",
+    "author": 5,
+    "daysAgo": 12
+  },
+  {
+    "title": "Déclaration de revenus : quelles cases oubliez-vous toujours ?",
+    "content": "Chaque année je redécouvre une case que j'avais laissée vide l'année précédente.\n\nOn se fait une liste collective de celles qu'on oublie le plus ?",
+    "type": "discussion",
+    "category": "impots",
+    "author": 2,
+    "daysAgo": 14
+  },
+  {
+    "title": "Rachat de trimestres : est-ce que ça valait le coup pour vous ?",
+    "content": "Il me manque sept trimestres et le devis de rachat me paraît très cher pour le gain annoncé.\n\nCeux qui l'ont fait, vous le referiez ?",
+    "type": "question",
+    "category": "retraite",
+    "author": 6,
+    "daysAgo": 16
+  },
+  {
+    "title": "Assurance-vie : un seul contrat ou plusieurs ?",
+    "content": "J'en ai un seul depuis douze ans et on me conseille d'en ouvrir un deuxième ailleurs. Je ne vois pas bien ce que ça apporte.",
+    "type": "question",
+    "category": "assurance-vie",
+    "author": 7,
+    "daysAgo": 11
+  },
+  {
+    "title": "Versements programmés : quel montant mensuel conseillez-vous ?",
+    "content": "Je veux mettre en place un virement automatique le lendemain de ma paie. Reste à fixer le montant sans me mettre en difficulté.",
+    "type": "question",
+    "category": "epargne",
+    "author": 3,
+    "daysAgo": 18
+  },
+  {
+    "title": "PEA ou compte-titres pour investir hors d'Europe ?",
+    "content": "Je voudrais m'exposer aux marchés américains et asiatiques. Mon PEA est-il adapté ou faut-il ouvrir un compte-titres en plus ?",
+    "type": "question",
+    "category": "bourse",
+    "author": 5,
+    "daysAgo": 20
+  },
+  {
+    "title": "Crédit immobilier : renégocier maintenant ou attendre ?",
+    "content": "Mon prêt court depuis quatre ans à un taux bien au-dessus de ce qui se pratique aujourd'hui. Ma banque traîne des pieds.",
+    "type": "question",
+    "category": "immobilier",
+    "author": 1,
+    "daysAgo": 22
+  },
+  {
+    "title": "Donner à ses enfants : quelles limites avant impôt ?",
+    "content": "Je voudrais aider mes deux enfants pour leur achat immobilier. J'aimerais comprendre les abattements avant d'aller voir le notaire.",
+    "type": "question",
+    "category": "impots",
+    "author": 6,
+    "daysAgo": 24
+  },
+  {
+    "title": "Quel âge pour commencer à penser à sa retraite ?",
+    "content": "Autour de moi, personne de moins de quarante ans ne regarde son relevé de carrière. Moi non plus, jusqu'à la semaine dernière.\n\nVous vous y êtes mis quand ?",
+    "type": "discussion",
+    "category": "retraite",
+    "author": 4,
+    "daysAgo": 26
+  },
+  {
+    "title": "Fonds en euros : vos rendements vous satisfont encore ?",
+    "content": "Après deux années de remontée, j'ai l'impression que l'écart avec les livrets s'est refermé. Vous en pensez quoi ?",
+    "type": "discussion",
+    "category": "assurance-vie",
+    "author": 0,
+    "daysAgo": 28
+  },
+  {
+    "title": "Livret A plein : où placer la suite ?",
+    "content": "J'ai atteint le plafond du livret A et celui du LDDS. L'argent qui arrive maintenant dort sur mon compte courant et ça m'agace.",
+    "type": "question",
+    "category": "epargne",
+    "author": 7,
+    "daysAgo": 0
+  },
+  {
+    "title": "Première déclaration de revenus : par quoi commencer ?",
+    "content": "Premier emploi l'an dernier, je n'ai jamais déclaré quoi que ce soit et je ne sais même pas si j'ai un numéro fiscal.",
+    "type": "question",
+    "category": "impots",
+    "author": 5,
+    "daysAgo": 0
+  },
+  {
+    "title": "Investir en SCPI à crédit : bonne ou mauvaise idée ?",
+    "content": "Un conseiller me propose de financer des parts de SCPI par un crédit sur quinze ans. Sur le papier l'effet de levier est séduisant.",
+    "type": "question",
+    "category": "immobilier",
+    "author": 2,
+    "daysAgo": 1
+  },
+  {
+    "title": "Dividendes ou capitalisation : votre préférence ?",
+    "content": "Je comprends l'intérêt fiscal de la capitalisation, mais voir tomber un dividende est autrement plus motivant.\n\nVous êtes de quel côté ?",
+    "type": "discussion",
+    "category": "bourse",
+    "author": 6,
+    "daysAgo": 3
+  },
+  {
+    "title": "Comment suivez-vous votre patrimoine au quotidien ?",
+    "content": "Tableur fait maison, application dédiée, ou rien du tout ? Je cherche quelque chose que je tiendrai vraiment dans le temps.",
+    "type": "discussion",
+    "category": "epargne",
+    "author": 4,
+    "daysAgo": 5
+  },
+  {
+    "title": "Clause bénéficiaire : vous l'avez relue récemment ?",
+    "content": "La mienne date de l'ouverture du contrat, avant mon divorce et avant la naissance de ma fille. Je crois que c'est le genre de papier qu'on oublie.",
+    "type": "discussion",
+    "category": "assurance-vie",
+    "author": 3,
+    "daysAgo": 10
+  },
+  {
+    "title": "PER ou assurance-vie pour préparer la retraite ?",
+    "content": "À quarante ans et dans une tranche d'imposition moyenne, j'hésite entre les deux enveloppes. L'argent bloqué du PER me refroidit.",
+    "type": "question",
+    "category": "retraite",
+    "author": 7,
+    "daysAgo": 13
+  },
+  {
+    "title": "Travaux déductibles en location nue : jusqu'où ?",
+    "content": "J'ai refait la salle de bains et changé les fenêtres d'un appartement loué vide. Je ne sais pas ce qui relève de l'entretien et ce qui compte comme amélioration.",
+    "type": "question",
+    "category": "impots",
+    "author": 1,
+    "daysAgo": 17
+  },
+  {
+    "title": "Combien de temps gardez-vous un ETF en portefeuille ?",
+    "content": "J'ai tendance à arbitrer dès qu'un indice sous-performe pendant quelques mois, et je soupçonne que ce soit ma pire habitude.",
+    "type": "question",
+    "category": "bourse",
+    "author": 0,
+    "daysAgo": 21
+  },
+  {
+    "title": "Prix des parts de SCPI : vous suivez encore le marché ?",
+    "content": "Entre les revalorisations et les baisses annoncées au compte-gouttes, j'ai arrêté de regarder. Quelqu'un suit ça sérieusement ?",
+    "type": "discussion",
+    "category": "immobilier",
+    "author": 5,
+    "daysAgo": 25
+  },
+  {
+    "title": "Retraite progressive : quelqu'un a testé ?",
+    "content": "Je voudrais passer à quatre jours deux ans avant l'âge légal. Mon employeur n'a jamais eu la demande et moi non plus.",
+    "type": "question",
+    "category": "retraite",
+    "author": 2,
+    "daysAgo": 32
+  },
+  {
+    "title": "Assurance-vie de plus de huit ans : vous retirez ou vous laissez ?",
+    "content": "Mon contrat vient de passer le cap des huit ans. Je n'ai pas de besoin immédiat, mais l'idée de profiter de la fiscalité me trotte dans la tête.",
+    "type": "question",
+    "category": "assurance-vie",
+    "author": 6,
+    "daysAgo": 45
   }
 ]

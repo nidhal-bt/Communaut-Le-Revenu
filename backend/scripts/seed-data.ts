@@ -3,6 +3,7 @@ import seedCategories from './seeders/categories';
 import seedUsers from './seeders/users';
 import seedDiscussions from './seeders/discussions';
 import seedReplies from './seeders/replies';
+import seedReplyCounts from './seeders/reply-counts';
 
 async function main() {
   const app = await createStrapi(await compileStrapi()).load();
@@ -13,6 +14,7 @@ async function main() {
     const users = await seedUsers(app);
     const discussions = await seedDiscussions(app, categories, users);
     await seedReplies(app, discussions, users);
+    await seedReplyCounts(app);
 
     console.log('\nDonnées de démonstration prêtes.');
   } finally {

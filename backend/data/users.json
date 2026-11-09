@@ -2,5 +2,9 @@
   { "username": "Vincent", "email": "vincent@demo.fr" },
   { "username": "Odile", "email": "odile@demo.fr" },
   { "username": "Camille", "email": "camille@demo.fr" },
-  { "username": "Karim", "email": "karim@demo.fr" }
+  { "username": "Karim", "email": "karim@demo.fr" },
+  { "username": "Nadia", "email": "nadia@demo.fr" },
+  { "username": "Thomas", "email": "thomas@demo.fr" },
+  { "username": "Julie", "email": "julie@demo.fr" },
+  { "username": "Bruno", "email": "bruno@demo.fr" }
 ]

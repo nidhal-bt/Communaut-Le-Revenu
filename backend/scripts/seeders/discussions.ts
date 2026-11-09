@@ -47,6 +47,9 @@ export default async function seedDiscussions(
         type: item.type,
         category: category.documentId,
         author: author.id,
+        // `required` depuis le schéma : à envoyer même avec un défaut. Les
+        // réponses semées juste après le feront monter.
+        replyCount: 0,
       },
     });
 
