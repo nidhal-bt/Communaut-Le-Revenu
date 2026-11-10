@@ -1,3 +1,4 @@
+import { StateCard } from "@/components/state-card";
 import type { FeedTabKey, FeedView } from "@/lib/feed-tabs";
 import type { Discussion } from "@/types/models";
 import { DiscussionCard } from "./discussion-card";
@@ -11,18 +12,18 @@ const FeedEmpty = ({ tab }: { tab: FeedTabKey }) => {
   const answered = tab === "sans-reponse";
 
   return (
-    <div className={`${FEED_SHELL} px-5 py-10 text-center`}>
-      <h3 className="mb-1.5 font-heading text-xl tracking-[-0.01em]">
-        {answered
+    <StateCard
+      title={
+        answered
           ? "Toutes les questions ont une réponse"
-          : "Rien ici pour l'instant"}
-      </h3>
-      <p className="text-sm text-foreground-secondary">
-        {answered
+          : "Rien ici pour l'instant"
+      }
+      description={
+        answered
           ? "Bravo à la communauté ! Revenez plus tard ou posez à votre tour une question."
-          : "Lancez la première discussion avec la barre de publication ci-dessus."}
-      </p>
-    </div>
+          : "Lancez la première discussion avec la barre de publication ci-dessus."
+      }
+    />
   );
 };
 
