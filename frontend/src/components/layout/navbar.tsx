@@ -102,16 +102,22 @@ export const Navbar = ({
         </span>
       </Link>
 
-      {/* Présentationnel : la recherche n'est pas encore branchée. */}
-      <div className="hidden h-9 max-w-[420px] flex-1 items-center gap-2 rounded-[10px] border border-transparent bg-accent px-3 text-sm text-muted-foreground focus-within:border-primary focus-within:bg-card focus-within:ring-3 focus-within:ring-ring/25 min-[860px]:flex">
+      {/* Un `form` nu : la soumission native emmène `q` sur /recherche, sans
+          `useRouter` ni gestionnaire. */}
+      <form
+        action="/recherche"
+        role="search"
+        className="hidden h-9 max-w-[420px] flex-1 items-center gap-2 rounded-[10px] border border-transparent bg-accent px-3 text-sm text-muted-foreground focus-within:border-primary focus-within:bg-card focus-within:ring-3 focus-within:ring-ring/25 min-[860px]:flex"
+      >
         <Search className="size-[18px] flex-none" />
         <input
           type="search"
+          name="q"
           aria-label="Rechercher"
           placeholder="Rechercher une discussion, un sujet…"
           className="h-full min-w-0 flex-1 bg-transparent text-foreground outline-none placeholder:text-muted-foreground"
         />
-      </div>
+      </form>
 
       <div className="ml-auto flex items-center gap-2.5">
         <Suspense fallback={<NavbarActionsSkeleton />}>

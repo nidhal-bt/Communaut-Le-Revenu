@@ -209,3 +209,58 @@ export const fetchTopOfWeek = async (
     return { failed: true };
   }
 };
+
+/**
+ * Le résultat d'une recherche, ou la panne.
+ *
+ * Même distinction que `TopOfWeek`, et pour la même raison : une liste vide
+ * ferait dire « aucune discussion trouvée » à un backend éteint.
+ */
+export type DiscussionSearch =
+  | { discussions: Discussion[]; pageCount: number; total: number }
+  | { failed: true };
+
+/**
+ * Les discussions dont le titre ou le contenu portent la recherche.
+ *
+ * Sans `use cache`, contrairement aux lectures ci-dessus : les arguments en
+ * forment la clé, et un texte libre y fabriquerait une entrée par recherche
+ * distincte. L'appelant doit donc se tenir sous une frontière `<Suspense>`.
+ *
+ * `$containsi` est insensible à la casse mais pas aux accents : « impots » ne
+ * trouve pas « impôts ».
+ */
+export const searchDiscussions = async (
+  query: string,
+  page: number,
+): Promise<DiscussionSearch> => {
+  try {
+    const { data, meta } = await strapiFetch<StrapiCollection<Discussion>>(
+      "/discussions",
+      {
+        query: {
+          filters: {
+            $or: [
+              { title: { $containsi: query } },
+              { content: { $containsi: query } },
+            ],
+          },
+          /* Le tri de « Tendances » : à pertinence égale — Strapi ne la calcule
+             pas —, la discussion la plus suivie passe devant. */
+          sort: ["replyCount:desc", "createdAt:desc"],
+          fields: DISCUSSION_FIELDS,
+          populate: DISCUSSION_POPULATE,
+          pagination: { page, pageSize: PAGE_SIZE },
+        },
+      },
+    );
+
+    return {
+      discussions: data,
+      pageCount: meta.pagination.pageCount,
+      total: meta.pagination.total,
+    };
+  } catch {
+    return { failed: true };
+  }
+};
