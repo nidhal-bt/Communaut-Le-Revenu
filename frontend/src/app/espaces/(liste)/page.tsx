@@ -7,7 +7,7 @@ import {
   SPACES_GRID,
   SpacesGridSkeleton,
   SpacesHeader,
-} from "./_components/spaces-grid";
+} from "../_components/spaces-grid";
 
 export const metadata: Metadata = {
   title: "Tous les espaces",
