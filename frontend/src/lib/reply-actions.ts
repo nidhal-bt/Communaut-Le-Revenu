@@ -11,6 +11,7 @@ import {
   discussionTag,
   HOME_FEED_TAG,
   repliesTag,
+  topOfWeekTag,
 } from "@/lib/strapi/tags";
 import type { Reply } from "@/types/models";
 import type { StrapiSingle } from "@/types/strapi";
@@ -104,6 +105,12 @@ export const createReplyAction = async (
        minute plutôt que de faire échouer la publication. */
     const slug = data.discussion?.category?.slug;
     if (slug) updateTag(categoryTag(slug));
+
+    /* La réponse vient de changer un classement du rail droit : celui du type
+       de sa discussion parente, et lui seul. Peuplé et donc protégé comme le
+       slug juste au-dessus. */
+    const parentType = data.discussion?.type;
+    if (parentType) updateTag(topOfWeekTag(parentType));
 
     /* Puis le routeur client, que `updateTag` ne touche pas : sans lui, il
        rejouerait la charge qu'il détient déjà. */

@@ -6,7 +6,7 @@ import {
   NotAuthenticatedError,
 } from "@/lib/auth/authenticated-fetch";
 import { StrapiError } from "@/lib/strapi/client";
-import { categoryTag, HOME_FEED_TAG } from "@/lib/strapi/tags";
+import { categoryTag, HOME_FEED_TAG, topOfWeekTag } from "@/lib/strapi/tags";
 import type { Discussion, DiscussionType } from "@/types/models";
 import type { StrapiSingle } from "@/types/strapi";
 
@@ -116,6 +116,11 @@ export const createDiscussionAction = async (
        mise en cache ne la connaît. Le contrôleur peuple `category`, le slug
        est donc là sans seconde requête. */
     updateTag(HOME_FEED_TAG);
+
+    /* Et le classement du rail droit de son type : la publication est la plus
+       récente de la semaine, elle gagne donc tous les ex æquo à son nombre de
+       réponses. Le type a été validé contre `TYPES` plus haut. */
+    updateTag(topOfWeekTag(type as DiscussionType));
 
     const slug = data.category?.slug;
     if (slug) updateTag(categoryTag(slug));

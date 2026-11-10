@@ -1,10 +1,15 @@
 import { cache } from "react";
 import { cacheLife, cacheTag } from "next/cache";
 import { queryForFeedTab, type FeedTabKey } from "@/lib/feed-tabs";
-import type { Discussion } from "@/types/models";
+import type { Discussion, DiscussionType } from "@/types/models";
 import type { StrapiCollection, StrapiSingle } from "@/types/strapi";
 import { StrapiError, strapiFetch } from "./client";
-import { categoryTag, discussionTag, HOME_FEED_TAG } from "./tags";
+import {
+  categoryTag,
+  discussionTag,
+  HOME_FEED_TAG,
+  topOfWeekTag,
+} from "./tags";
 
 /** La projection partagée par le fil et la page d'une discussion. */
 const DISCUSSION_FIELDS = [
@@ -114,3 +119,80 @@ export const fetchDiscussion = cache(
     }
   },
 );
+
+const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+
+/**
+ * Une semaine vide et un backend éteint ne doivent pas se ressembler : un
+ * tableau nu confondrait les deux, et la carte annoncerait « rien cette
+ * semaine » au milieu d'une panne.
+ */
+export type TopOfWeek = { discussions: Discussion[] } | { failed: true };
+
+/**
+ * Le haut du classement des sept derniers jours, pour les cartes du rail droit.
+ *
+ * `use cache` prend les arguments pour clé : la question et les discussions ont
+ * chacune leur entrée, et chacune son étiquette — une réponse ne périme donc
+ * que la carte du type de sa discussion parente.
+ *
+ * `createdAt` et non `publishedAt` : `draftAndPublish` est désactivé sur les
+ * trois types de contenu, ce second champ ne signale donc aucun cycle de
+ * publication.
+ *
+ * `Date.now()` est appelé *dans* la portée `use cache`, et c'est la seule place
+ * où il peut l'être : ailleurs, `cacheComponents` en fait une erreur de build.
+ * La valeur est capturée dans l'entrée, le bord de la fenêtre a donc le retard
+ * du profil ci-dessous — une heure au plus, sur sept jours. Le profil est long
+ * exprès : la fraîcheur vient des étiquettes, que les deux actions périment.
+ */
+const readTopOfWeek = async (
+  type: DiscussionType,
+  limit: number,
+): Promise<Discussion[]> => {
+  "use cache";
+  cacheLife({ stale: 300, revalidate: 900, expire: 3600 });
+  cacheTag(topOfWeekTag(type));
+
+  const { data } = await strapiFetch<StrapiCollection<Discussion>>(
+    "/discussions",
+    {
+      query: {
+        filters: {
+          type: { $eq: type },
+          createdAt: { $gte: new Date(Date.now() - WEEK_MS).toISOString() },
+        },
+        fields: DISCUSSION_FIELDS,
+        populate: DISCUSSION_POPULATE,
+        /* `createdAt` départage, comme l'onglet « tendances » : Postgres ne
+           garantit aucun ordre entre ex æquo, et la plus récente doit
+           gagner. */
+        sort: ["replyCount:desc", "createdAt:desc"],
+        pagination: { pageSize: limit },
+      },
+    },
+  );
+
+  return data;
+};
+
+/**
+ * La panne décidée *hors* de la portée mise en cache, pour la même raison que
+ * `fetchDiscussion` plus bas : un `{ failed: true }` renvoyé depuis `use cache`
+ * serait mis en cache comme n'importe quelle valeur, et la carte annoncerait
+ * encore la panne une heure après le retour de Strapi.
+ *
+ * Et une panne plutôt qu'une exception : le rail est monté dans le layout, où
+ * lever ferait tomber toutes les routes sur `app/error.tsx` pour une carte
+ * décorative.
+ */
+export const fetchTopOfWeek = async (
+  type: DiscussionType,
+  limit: number,
+): Promise<TopOfWeek> => {
+  try {
+    return { discussions: await readTopOfWeek(type, limit) };
+  } catch {
+    return { failed: true };
+  }
+};

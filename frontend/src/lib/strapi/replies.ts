@@ -53,3 +53,48 @@ export const fetchReplies = async (
     return { replies: [], total: 0 };
   }
 };
+
+/**
+ * La dernière réponse d'une discussion, pour la carte « question de la semaine »
+ * du rail droit.
+ *
+ * Une lecture à part plutôt que la fin de `fetchReplies` : celle-ci tire jusqu'à
+ * cent lignes, là où le bloc n'en affiche qu'une. Même étiquette que l'autre, que
+ * `reply-actions.ts` périme déjà.
+ */
+const readLatestReply = async (
+  discussionDocumentId: string,
+): Promise<Reply | null> => {
+  "use cache";
+  cacheLife({ stale: 30, revalidate: 60, expire: 300 });
+  cacheTag(repliesTag(discussionDocumentId));
+
+  const { data } = await strapiFetch<StrapiCollection<Reply>>("/replies", {
+    query: {
+      filters: { discussion: { documentId: { $eq: discussionDocumentId } } },
+      fields: ["content", "createdAt"],
+      populate: { author: { fields: ["username"] } },
+      sort: ["createdAt:desc"],
+      pagination: { pageSize: 1 },
+    },
+  });
+
+  return data[0] ?? null;
+};
+
+/**
+ * L'échec décidé hors de la portée mise en cache, pour que la panne ne soit pas
+ * mise en cache avec le reste — même découpe que `fetchTopOfWeek`.
+ *
+ * Pas d'état d'erreur distinct pour autant : le bloc est secondaire, un échec le
+ * replie et laisse la question lisible.
+ */
+export const fetchLatestReply = async (
+  discussionDocumentId: string,
+): Promise<Reply | null> => {
+  try {
+    return await readLatestReply(discussionDocumentId);
+  } catch {
+    return null;
+  }
+};

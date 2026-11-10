@@ -32,3 +32,22 @@ export const RailCard = ({
     {children}
   </section>
 );
+
+/**
+ * La carte réduite à une ligne : « rien cette semaine » comme « ce bloc n'a pas
+ * pu être chargé ».
+ *
+ * Les deux cartes du haut portent chacune ces deux états ; les réunir ici évite
+ * d'en écrire quatre fois le même paragraphe. Le texte reste le mot de
+ * l'appelant : c'est lui qui sait s'il parle d'une question ou d'une discussion,
+ * et d'un vide ou d'une panne.
+ */
+export const RailCardMessage = ({
+  title,
+  icon,
+  children,
+}: Pick<RailCardProps, "title" | "icon" | "children">) => (
+  <RailCard title={title} icon={icon}>
+    <p className="text-sm text-foreground-secondary">{children}</p>
+  </RailCard>
+);
