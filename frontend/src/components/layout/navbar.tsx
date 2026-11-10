@@ -4,10 +4,11 @@ import { Suspense, use, useState } from "react";
 import Link from "next/link";
 import { Bell, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { AccountMenu } from "@/components/auth/account-menu";
 import { LoginModal } from "@/components/auth/login-modal";
 import { PublishButton } from "@/components/composer/publish-button";
 import { useAuth } from "@/lib/auth/auth-context";
-import type { Category, User } from "@/types/models";
+import type { Category } from "@/types/models";
 
 /**
  * Logotype reconstitué d'après la home de lerevenu.com : un bloc rouge
@@ -26,23 +27,6 @@ const Wordmark = () => (
       REVENU
     </span>
   </span>
-);
-
-const initial = (username: string) => username.trim().charAt(0).toUpperCase();
-
-const AccountPill = ({ user }: { user: User }) => (
-  <button
-    type="button"
-    aria-label="Mon compte"
-    className="flex items-center gap-2 rounded-full border bg-card py-[3px] pr-2.5 pl-[3px] shadow-lift hover:bg-secondary"
-  >
-    <span className="grid size-[30px] place-items-center rounded-full bg-avatar-5 text-[11.5px] font-semibold text-primary-foreground">
-      {initial(user.username)}
-    </span>
-    <span className="text-[12.5px] font-semibold text-foreground-secondary">
-      {user.username}
-    </span>
-  </button>
 );
 
 /**
@@ -73,7 +57,7 @@ const NavbarActions = ({
         >
           <Bell className="size-[18px]" />
         </button>
-        <AccountPill user={user} />
+        <AccountMenu user={user} />
       </>
     );
   }

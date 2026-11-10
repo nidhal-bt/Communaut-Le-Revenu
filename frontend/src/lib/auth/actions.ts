@@ -1,9 +1,10 @@
 "use server";
 
-import { login } from "@/lib/strapi/auth";
+import { after } from "next/server";
+import { login, logout } from "@/lib/strapi/auth";
 import { StrapiError } from "@/lib/strapi/client";
 import type { User } from "@/types/models";
-import { writeSession } from "./session";
+import { clearSession, readSession, writeSession } from "./session";
 
 /**
  * Server Actions de l'authentification.
@@ -13,10 +14,9 @@ import { writeSession } from "./session";
  * part du navigateur vers notre serveur, pas vers Strapi, et le jeton n'est
  * jamais exposé au JavaScript de la page.
  *
- * **La déconnexion est encore à venir.** La rotation du jeton, elle, est
- * branchée : le jeton d'accès ne vit que 10 minutes (voir `session.ts`), et
- * `authenticated-fetch.ts` échange le jeton de rotation dès qu'un appel de
- * membre revient en 401.
+ * La rotation du jeton vit ailleurs : le jeton d'accès ne dure que 10 minutes
+ * (voir `session.ts`), et `authenticated-fetch.ts` échange le jeton de rotation
+ * dès qu'un appel de membre revient en 401.
  */
 
 export type LoginResult = { user: User } | { error: string };
@@ -59,4 +59,36 @@ export const loginAction = async (formData: FormData): Promise<LoginResult> => {
   } catch (error) {
     return { error: messageFor(error) };
   }
+};
+
+/**
+ * Déconnexion.
+ *
+ * Notre cookie part **d'abord**, et c'est lui seul qui décide : un backend
+ * éteint ou un jeton déjà expiré ne doit pas laisser le membre connecté chez
+ * nous.
+ *
+ * La révocation chez Strapi suit, mais après la réponse (`after`) : elle n'a
+ * aucune raison de retenir l'interface, et sans cela un backend injoignable
+ * ferait attendre le membre le temps du timeout avant que l'en-tête ne
+ * rebascule.
+ *
+ * Rien n'est renvoyé et rien n'est redirigé : toutes les pages sont publiques,
+ * c'est donc à l'appelant de décider où il reste.
+ */
+export const logoutAction = async (): Promise<void> => {
+  const session = await readSession();
+
+  await clearSession();
+
+  if (session === null) return;
+
+  after(async () => {
+    try {
+      await logout(session.jwt, session.refreshToken);
+    } catch {
+      /* Au mieux : le cookie est déjà parti, il n'y a plus rien à rattraper ni
+         rien à annoncer à un membre déjà déconnecté de notre côté. */
+    }
+  });
 };

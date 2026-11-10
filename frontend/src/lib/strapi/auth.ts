@@ -5,7 +5,8 @@ import { toStrapiError } from "./client";
 import { STRAPI_API_URL } from "./config";
 
 /**
- * Les deux appels d'authentification : la connexion et la rotation du jeton.
+ * Les trois appels d'authentification : la connexion, la rotation du jeton et
+ * la déconnexion.
  *
  * Il ne passe pas par `strapiFetch` pour deux raisons : c'est un POST sans
  * paramètres de requête, et surtout il faut lire les en-têtes de la réponse,
@@ -120,4 +121,36 @@ export const refresh = async (
   const { jwt } = (await response.json()) as { jwt: string };
 
   return { jwt, refreshToken: readRefreshToken(response) };
+};
+
+/**
+ * `POST /api/auth/logout` — révoque la session côté Strapi.
+ *
+ * Le jeton d'accès autorise l'appel, et le jeton de rotation, dans le corps,
+ * désigne *laquelle* des sessions du membre tombe. Le plugin lit d'abord son
+ * propre cookie, retombe sur `body.refreshToken`, et seulement ensuite sur la
+ * session portée par le jeton d'accès (`controllers/auth.js`) : depuis Node il
+ * n'y a pas de cookie, on l'envoie donc explicitement plutôt que de s'en
+ * remettre au dernier recours.
+ *
+ * La route n'existe que sous `jwtManagement: 'refresh'`, le mode configuré
+ * dans `backend/config/plugins.ts` — ailleurs le contrôleur répond 404.
+ */
+export const logout = async (
+  jwt: string,
+  refreshToken: string | null,
+): Promise<void> => {
+  const response = await fetch(`${STRAPI_API_URL}/auth/logout`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${jwt}`,
+    },
+    body: JSON.stringify(refreshToken === null ? {} : { refreshToken }),
+  });
+
+  if (!response.ok) {
+    throw await toStrapiError(response);
+  }
 };
