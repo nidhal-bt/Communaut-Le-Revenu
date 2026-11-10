@@ -32,23 +32,36 @@ const DISCUSSION_POPULATE = {
 const PAGE_SIZE = 20;
 
 /**
- * La première page du fil pour un onglet donné, éventuellement restreinte à un
- * espace.
+ * Une page du fil, et de quoi en fabriquer le pager.
  *
- * `use cache` prend l'argument pour clé : chaque onglet a son entrée. Le profil
+ * `pageCount` plutôt que le `meta.pagination` entier : c'est le seul nombre
+ * dont le pager a besoin, et `page` comme `pageSize` sont déjà connus de
+ * l'appelant.
+ */
+export type DiscussionFeed = {
+  discussions: Discussion[];
+  pageCount: number;
+};
+
+/**
+ * Une page du fil pour un onglet donné, éventuellement restreinte à un espace.
+ *
+ * `use cache` prend les arguments pour clé : chaque onglet a son entrée, et
+ * chaque page la sienne. Le profil
  * est volontairement court — une minute avant de réinterroger Strapi — et
  * `stale: 30` est le plancher imposé par le routeur client, en dessous duquel
  * la valeur est ignorée.
  *
  * Le rôle public détient `discussion.find`, aucun jeton n'est donc nécessaire.
  * Comme `categories.ts`, un backend éteint renvoie une liste vide plutôt que de
- * faire tomber l'accueil.
+ * faire tomber l'accueil — avec `pageCount: 0`, qui efface le pager.
  */
 export const fetchDiscussions = async (
   tab: FeedTabKey,
+  page: number,
   userId?: number,
   categorySlug?: string,
-): Promise<Discussion[]> => {
+): Promise<DiscussionFeed> => {
   "use cache";
   cacheLife({ stale: 30, revalidate: 60, expire: 300 });
   /* `categorySlug` est déjà ce qui sépare les entrées : sans lui on tient le
@@ -57,21 +70,21 @@ export const fetchDiscussions = async (
   cacheTag(categorySlug ? categoryTag(categorySlug) : HOME_FEED_TAG);
 
   try {
-    const { data } = await strapiFetch<StrapiCollection<Discussion>>(
+    const { data, meta } = await strapiFetch<StrapiCollection<Discussion>>(
       "/discussions",
       {
         query: {
           ...queryForFeedTab(tab, userId, categorySlug),
           fields: DISCUSSION_FIELDS,
           populate: DISCUSSION_POPULATE,
-          pagination: { pageSize: PAGE_SIZE },
+          pagination: { page, pageSize: PAGE_SIZE },
         },
       },
     );
 
-    return data;
+    return { discussions: data, pageCount: meta.pagination.pageCount };
   } catch {
-    return [];
+    return { discussions: [], pageCount: 0 };
   }
 };
 

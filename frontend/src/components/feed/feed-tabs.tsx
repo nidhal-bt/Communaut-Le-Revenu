@@ -12,6 +12,7 @@ import {
   type FeedTab,
   type FeedTabKey,
 } from "@/lib/feed-tabs";
+import { feedHref } from "@/lib/feed-url";
 import { cn } from "@/lib/utils";
 
 /** Le `seg` de la maquette, partagé avec le sélecteur de densité. */
@@ -99,20 +100,10 @@ export const FeedTabs = ({ category }: { category?: string }) => {
   const searchParams = useSearchParams();
   const activeTab = resolveFeedTab(searchParams.get("tab") ?? undefined);
 
-  // L'onglet par défaut ne porte pas de query : arriver sur la page n'écrit
-  // rien dans l'URL, et y revenir nettoie le paramètre.
-  const hrefFor = (key: FeedTabKey) => {
-    const params = new URLSearchParams(searchParams.toString());
-
-    if (key === DEFAULT_FEED_TAB) {
-      params.delete("tab");
-    } else {
-      params.set("tab", key);
-    }
-
-    const query = params.toString();
-    return query ? `${pathname}?${query}` : pathname;
-  };
+  /* `feedHref` tient les deux règles de l'adresse du fil : l'onglet par défaut
+     ne porte pas de query, et changer d'onglet repart de la première page. */
+  const hrefFor = (key: FeedTabKey) =>
+    feedHref(pathname, searchParams, { tab: key });
 
   return (
     <nav

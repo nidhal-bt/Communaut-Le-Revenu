@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getSessionUser } from "@/lib/auth/session";
 import { isMemberFeedTab, resolveFeedTab } from "@/lib/feed-tabs";
+import { feedHref, resolveFeedPage } from "@/lib/feed-url";
 import { fetchDiscussions } from "@/lib/strapi/discussions";
 import { Feed } from "./feed";
 
@@ -12,7 +13,7 @@ type FeedSectionProps = {
 };
 
 /**
- * Résout l'onglet puis charge sa première page.
+ * Résout l'onglet et le numéro de page, puis charge cette page.
  *
  * `searchParams` est attendu *ici*, pas dans `page.tsx` : une lecture de la
  * requête dans le corps de la page la rendrait dynamique en entier, et le hero
@@ -35,15 +36,40 @@ export const FeedSection = async ({
   searchParams,
   categorySlug,
 }: FeedSectionProps) => {
-  const { tab } = await searchParams;
+  const { tab, page } = await searchParams;
   const feedTab = resolveFeedTab(typeof tab === "string" ? tab : undefined);
+  const feedPage = resolveFeedPage(typeof page === "string" ? page : undefined);
   const user = isMemberFeedTab(feedTab) ? await getSessionUser() : null;
 
   if (isMemberFeedTab(feedTab) && !user) redirect(pathname);
 
-  const discussions = await fetchDiscussions(feedTab, user?.id, categorySlug);
+  const { discussions, pageCount } = await fetchDiscussions(
+    feedTab,
+    feedPage,
+    user?.id,
+    categorySlug,
+  );
+
+  /* Une page au-delà de la dernière est ramenée sur la dernière, et non laissée
+     afficher « Rien ici pour l'instant » au milieu d'un fil pourtant plein.
+     `pageCount` à zéro est le fil vide ou le backend éteint : il n'y a alors
+     aucune page où renvoyer. L'onglet et la page sont les deux seuls
+     paramètres du fil, les reposer suffit donc à reconstruire l'adresse. */
+  if (pageCount > 0 && feedPage > pageCount) {
+    redirect(
+      feedHref(pathname, new URLSearchParams(), {
+        tab: feedTab,
+        page: pageCount,
+      }),
+    );
+  }
 
   return (
-    <Feed discussions={discussions} tab={feedTab} category={categorySlug} />
+    <Feed
+      discussions={discussions}
+      pageCount={pageCount}
+      tab={feedTab}
+      category={categorySlug}
+    />
   );
 };

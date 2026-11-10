@@ -8,11 +8,13 @@ import {
 } from "@/lib/feed-tabs";
 import type { Discussion } from "@/types/models";
 import { FeedList } from "./feed-list";
+import { FeedPagination } from "./feed-pagination";
 import { FeedTabs } from "./feed-tabs";
 import { FeedViewToggle } from "./feed-view-toggle";
 
 type FeedProps = {
   discussions: Discussion[];
+  pageCount: number;
   tab: FeedTabKey;
   category?: string;
 };
@@ -27,7 +29,12 @@ type FeedProps = {
  * La session n'est lue ni ici ni dans le sélecteur de densité, seulement dans
  * l'onglet membre : le fil entier n'attend donc jamais le cookie.
  */
-export const Feed = ({ discussions, tab, category }: FeedProps) => {
+export const Feed = ({
+  discussions,
+  pageCount,
+  tab,
+  category,
+}: FeedProps) => {
   const [view, setView] = useState<FeedView>(DEFAULT_FEED_VIEW);
 
   return (
@@ -38,6 +45,8 @@ export const Feed = ({ discussions, tab, category }: FeedProps) => {
       </div>
 
       <FeedList discussions={discussions} view={view} tab={tab} />
+
+      <FeedPagination pageCount={pageCount} />
     </div>
   );
 };

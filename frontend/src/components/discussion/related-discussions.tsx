@@ -1,5 +1,6 @@
 import { DiscussionCard } from "@/components/feed/discussion-card";
 import { FEED_SHELL } from "@/components/feed/feed-list";
+import { DEFAULT_FEED_PAGE } from "@/lib/feed-url";
 import { fetchDiscussions } from "@/lib/strapi/discussions";
 import type { Category } from "@/types/models";
 import { SECTION_TITLE } from "./post-shell";
@@ -8,9 +9,9 @@ import { SECTION_TITLE } from "./post-shell";
  * « À lire aussi dans {espace} » : trois discussions du même espace.
  *
  * `tendances` trie par nombre de réponses puis par date, ce dont le `hot()` de
- * la maquette s'approche. Les trois arguments sont exactement ceux que la page
- * d'un espace passe déjà : la lecture partage donc son entrée de cache et ne
- * coûte aucune requête supplémentaire.
+ * la maquette s'approche. Les arguments sont exactement ceux que la page d'un
+ * espace passe déjà pour sa **première** page : la lecture partage donc son
+ * entrée de cache et ne coûte aucune requête supplémentaire.
  *
  * Le filtre vient avant la coupe — couper d'abord laisserait deux cartes
  * lorsque trois existent.
@@ -22,8 +23,9 @@ export const RelatedDiscussions = async ({
   category: Category;
   excludeDocumentId: string;
 }) => {
-  const discussions = await fetchDiscussions(
+  const { discussions } = await fetchDiscussions(
     "tendances",
+    DEFAULT_FEED_PAGE,
     undefined,
     category.slug,
   );
