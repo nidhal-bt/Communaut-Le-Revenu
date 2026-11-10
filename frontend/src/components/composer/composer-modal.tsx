@@ -1,6 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { Shield, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,7 @@ import {
 import { FIELD } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { createDiscussionAction } from "@/lib/discussion-actions";
+import { discussionHref } from "@/lib/discussion-slug";
 import { DISCUSSION_TYPES, findDiscussionType } from "@/lib/discussion-types";
 import { cn } from "@/lib/utils";
 import type { Category, DiscussionType } from "@/types/models";
@@ -51,6 +53,7 @@ export const ComposerModal = ({
   const selected = findDiscussionType(type);
   const hasCategories = categories.length > 0;
   const [pending, startTransition] = useTransition();
+  const router = useRouter();
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -73,6 +76,13 @@ export const ComposerModal = ({
       form.reset();
       onOpenChange(false);
       toast.success("Votre publication est en ligne.");
+
+      /* Puis la discussion qui vient de naître : fermer sur place laisserait le
+         membre chercher sa publication dans le fil. Le contrôleur renvoie le
+         document créé, `discussionHref` a donc son titre et son `documentId`
+         sans seconde lecture. Fermée avant d'être poussée, la modale disparaît
+         proprement au lieu d'être démontée par la navigation. */
+      router.push(discussionHref(result.discussion));
     });
   };
 
