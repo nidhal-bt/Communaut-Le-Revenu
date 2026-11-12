@@ -29,6 +29,13 @@ const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Plugin =>
       jwtManagement: 'refresh',
       sessions: {
         httpOnly: true,
+        cookie: {
+          // Le plugin met `secure` à vrai dès que NODE_ENV vaut production, et
+          // Koa refuse alors d'émettre le cookie sur une connexion non chiffrée :
+          // toute connexion répond 500. La stack Docker locale sert du HTTP en
+          // clair, elle passe donc explicitement SESSION_COOKIE_SECURE=false.
+          secure: env.bool('SESSION_COOKIE_SECURE', env('NODE_ENV') === 'production'),
+        },
       },
     },
   },
