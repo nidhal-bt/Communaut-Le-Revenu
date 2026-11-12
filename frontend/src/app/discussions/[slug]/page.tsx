@@ -37,19 +37,30 @@ const excerpt = (content: string): string => {
  * l'identifiant seul faisant l'identité, et rediriger depuis le corps de la
  * page demanderait d'y attendre `params`, ce qui rendrait toute la route
  * bloquante.
+ *
+ * Le `try` ne couvre pas une discussion absente — `fetchDiscussion` renvoie `null`
+ * pour ça — mais un backend injoignable. `next build` prérend la coquille de
+ * la route, et `generateMetadata` n'est sous aucune frontière de Suspense :
+ * sans ce filet, construire l'image frontend imposerait d'avoir déjà l'API
+ * debout. Le vrai 404 reste décidé dans le corps de la page.
  */
 export const generateMetadata = async ({
   params,
 }: PageProps<"/discussions/[slug]">): Promise<Metadata> => {
   const { slug } = await params;
-  const discussion = await fetchDiscussion(documentIdFromSlug(slug));
 
-  if (!discussion) return {};
+  try {
+    const discussion = await fetchDiscussion(documentIdFromSlug(slug));
 
-  return {
-    title: discussion.title,
-    description: excerpt(discussion.content),
-  };
+    if (!discussion) return {};
+
+    return {
+      title: discussion.title,
+      description: excerpt(discussion.content),
+    };
+  } catch {
+    return {};
+  }
 };
 
 const DiscussionMain = async ({ params }: { params: DiscussionParams }) => {

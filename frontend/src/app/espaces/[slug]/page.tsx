@@ -14,19 +14,30 @@ type SpaceParams = PageProps<"/espaces/[slug]">["params"];
 /**
  * `fetchCategory` passe par `cache` de React : cette lecture et celle de
  * l'en-tête n'en font qu'une.
+ *
+ * Le `try` ne couvre pas un espace absent — `fetchCategory` renvoie `null`
+ * pour ça — mais un backend injoignable. `next build` prérend la coquille de
+ * la route, et `generateMetadata` n'est sous aucune frontière de Suspense :
+ * sans ce filet, construire l'image frontend imposerait d'avoir déjà l'API
+ * debout. Le vrai 404 reste décidé dans le corps de la page.
  */
 export const generateMetadata = async ({
   params,
 }: PageProps<"/espaces/[slug]">): Promise<Metadata> => {
   const { slug } = await params;
-  const category = await fetchCategory(slug);
 
-  if (!category) return {};
+  try {
+    const category = await fetchCategory(slug);
 
-  return {
-    title: category.name,
-    description: category.description ?? undefined,
-  };
+    if (!category) return {};
+
+    return {
+      title: category.name,
+      description: category.description ?? undefined,
+    };
+  } catch {
+    return {};
+  }
 };
 
 const CategoryHeaderSection = async ({ params }: { params: SpaceParams }) => {

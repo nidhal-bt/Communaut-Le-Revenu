@@ -24,12 +24,14 @@ export type DiscussionReplies = {
  * Contrairement à `fetchDiscussion`, un échec renvoie un fil vide plutôt que de
  * lever : cette lecture ne décide d'aucun 404, et la discussion elle-même peut
  * encore venir du cache quand Strapi s'arrête.
+ *
+ * Le `cacheLife` est posé par branche : un fil vide pour cause de panne ne
+ * doit pas tenir cinq minutes comme un vrai fil vide.
  */
 export const fetchReplies = async (
   discussionDocumentId: string,
 ): Promise<DiscussionReplies> => {
   "use cache";
-  cacheLife({ stale: 30, revalidate: 60, expire: 300 });
   cacheTag(repliesTag(discussionDocumentId));
 
   try {
@@ -48,8 +50,12 @@ export const fetchReplies = async (
       },
     );
 
+    cacheLife({ stale: 30, revalidate: 60, expire: 300 });
+
     return { replies: data, total: meta.pagination.total };
   } catch {
+    cacheLife("seconds");
+
     return { replies: [], total: 0 };
   }
 };
@@ -61,40 +67,36 @@ export const fetchReplies = async (
  * Une lecture à part plutôt que la fin de `fetchReplies` : celle-ci tire jusqu'à
  * cent lignes, là où le bloc n'en affiche qu'une. Même étiquette que l'autre, que
  * `reply-actions.ts` périme déjà.
- */
-const readLatestReply = async (
-  discussionDocumentId: string,
-): Promise<Reply | null> => {
-  "use cache";
-  cacheLife({ stale: 30, revalidate: 60, expire: 300 });
-  cacheTag(repliesTag(discussionDocumentId));
-
-  const { data } = await strapiFetch<StrapiCollection<Reply>>("/replies", {
-    query: {
-      filters: { discussion: { documentId: { $eq: discussionDocumentId } } },
-      fields: ["content", "createdAt"],
-      populate: { author: { fields: ["username"] } },
-      sort: ["createdAt:desc"],
-      pagination: { pageSize: 1 },
-    },
-  });
-
-  return data[0] ?? null;
-};
-
-/**
- * L'échec décidé hors de la portée mise en cache, pour que la panne ne soit pas
- * mise en cache avec le reste — même découpe que `fetchTopOfWeek`.
  *
- * Pas d'état d'erreur distinct pour autant : le bloc est secondaire, un échec le
- * replie et laisse la question lisible.
+ * L'échec est attrapé *dans* la portée mise en cache — Next remplit ces caches
+ * au `build`, où lever ferait échouer l'export dès que Strapi n'écoute pas — et
+ * `cacheLife('seconds')` l'empêche d'y rester cinq minutes. Pas d'état d'erreur
+ * distinct pour autant : le bloc est secondaire, un échec le replie et laisse la
+ * question lisible.
  */
 export const fetchLatestReply = async (
   discussionDocumentId: string,
 ): Promise<Reply | null> => {
+  "use cache";
+  cacheTag(repliesTag(discussionDocumentId));
+
   try {
-    return await readLatestReply(discussionDocumentId);
+    const { data } = await strapiFetch<StrapiCollection<Reply>>("/replies", {
+      query: {
+        filters: { discussion: { documentId: { $eq: discussionDocumentId } } },
+        fields: ["content", "createdAt"],
+        populate: { author: { fields: ["username"] } },
+        sort: ["createdAt:desc"],
+        pagination: { pageSize: 1 },
+      },
+    });
+
+    cacheLife({ stale: 30, revalidate: 60, expire: 300 });
+
+    return data[0] ?? null;
   } catch {
+    cacheLife("seconds");
+
     return null;
   }
 };

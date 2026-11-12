@@ -88,48 +88,66 @@ export const fetchDiscussions = async (
   }
 };
 
+type DiscussionRead =
+  | { discussion: Discussion }
+  | { missing: true }
+  | { failed: true };
+
 /**
- * La lecture mise en cache, qui lève sur n'importe quel statut non-2xx.
+ * La lecture mise en cache : la discussion, son absence, ou la panne.
  *
  * Étiquetée par document, et jamais avec celle d'un fil : une réponse sur une
  * discussion n'a aucune raison de périmer la lecture de toutes les autres.
+ *
+ * Les trois issues sont distinguées *dans* la portée mise en cache et non
+ * autour, parce que Next remplit ces caches au `build` : une portée qui lève
+ * y fait échouer l'export dès que Strapi n'écoute pas, et construire l'image
+ * frontend imposerait alors d'avoir déjà l'API debout. Ce que la découpe
+ * d'avant protégeait — ne pas figer une panne cinq minutes — revient au
+ * `cacheLife('seconds')` des branches négatives.
  */
-const readDiscussion = async (documentId: string): Promise<Discussion> => {
+const readDiscussion = async (documentId: string): Promise<DiscussionRead> => {
   "use cache";
-  cacheLife({ stale: 30, revalidate: 60, expire: 300 });
   cacheTag(discussionTag(documentId));
 
-  const { data } = await strapiFetch<StrapiSingle<Discussion>>(
-    `/discussions/${documentId}`,
-    { query: { fields: DISCUSSION_FIELDS, populate: DISCUSSION_POPULATE } },
-  );
+  try {
+    const { data } = await strapiFetch<StrapiSingle<Discussion>>(
+      `/discussions/${documentId}`,
+      { query: { fields: DISCUSSION_FIELDS, populate: DISCUSSION_POPULATE } },
+    );
 
-  return data;
+    cacheLife({ stale: 30, revalidate: 60, expire: 300 });
+
+    return { discussion: data };
+  } catch (error) {
+    cacheLife("seconds");
+
+    if (error instanceof StrapiError && error.status === 404) {
+      return { missing: true };
+    }
+
+    return { failed: true };
+  }
 };
 
 /**
  * Une discussion depuis son `documentId`, ou `null` si elle n'existe pas.
  *
- * La mise en cache et la décision du 404 sont séparées exprès. `fetchCategory`
- * renonce à `use cache` parce qu'il craint de mettre le *négatif* en cache ;
- * ici le négatif ne l'est jamais : la portée mise en cache lève, et le `null`
- * est fabriqué dehors, par une fonction sans directive.
- *
- * Seul un 404 devient `null`. Tout le reste est relancé : avaler l'erreur
- * ferait passer un backend éteint pour « cette discussion n'existe pas ».
+ * Seule l'absence devient `null` ; la panne lève. Les confondre ferait passer
+ * un backend éteint pour « cette discussion n'existe pas », et la page rendrait
+ * un 404 au lieu d'une erreur.
  *
  * `cache` de React dédoublonne les trois lectures d'une même requête —
  * `generateMetadata`, le fil de discussion et le bloc « À lire aussi ».
  */
 export const fetchDiscussion = cache(
   async (documentId: string): Promise<Discussion | null> => {
-    try {
-      return await readDiscussion(documentId);
-    } catch (error) {
-      if (error instanceof StrapiError && error.status === 404) return null;
+    const result = await readDiscussion(documentId);
 
-      throw error;
-    }
+    if ("discussion" in result) return result.discussion;
+    if ("missing" in result) return null;
+
+    throw new Error(`Lecture impossible de la discussion ${documentId}`);
   },
 );
 
@@ -156,56 +174,51 @@ export type TopOfWeek = { discussions: Discussion[] } | { failed: true };
  * `Date.now()` est appelé *dans* la portée `use cache`, et c'est la seule place
  * où il peut l'être : ailleurs, `cacheComponents` en fait une erreur de build.
  * La valeur est capturée dans l'entrée, le bord de la fenêtre a donc le retard
- * du profil ci-dessous — une heure au plus, sur sept jours. Le profil est long
- * exprès : la fraîcheur vient des étiquettes, que les deux actions périment.
- */
-const readTopOfWeek = async (
-  type: DiscussionType,
-  limit: number,
-): Promise<Discussion[]> => {
-  "use cache";
-  cacheLife({ stale: 300, revalidate: 900, expire: 3600 });
-  cacheTag(topOfWeekTag(type));
-
-  const { data } = await strapiFetch<StrapiCollection<Discussion>>(
-    "/discussions",
-    {
-      query: {
-        filters: {
-          type: { $eq: type },
-          createdAt: { $gte: new Date(Date.now() - WEEK_MS).toISOString() },
-        },
-        fields: DISCUSSION_FIELDS,
-        populate: DISCUSSION_POPULATE,
-        /* `createdAt` départage, comme l'onglet « tendances » : Postgres ne
-           garantit aucun ordre entre ex æquo, et la plus récente doit
-           gagner. */
-        sort: ["replyCount:desc", "createdAt:desc"],
-        pagination: { pageSize: limit },
-      },
-    },
-  );
-
-  return data;
-};
-
-/**
- * La panne décidée *hors* de la portée mise en cache, pour la même raison que
- * `fetchDiscussion` plus bas : un `{ failed: true }` renvoyé depuis `use cache`
- * serait mis en cache comme n'importe quelle valeur, et la carte annoncerait
- * encore la panne une heure après le retour de Strapi.
+ * du profil de la branche réussie — une heure au plus, sur sept jours. Ce
+ * profil est long exprès : la fraîcheur vient des étiquettes, que les deux
+ * actions périment.
  *
- * Et une panne plutôt qu'une exception : le rail est monté dans le layout, où
- * lever ferait tomber toutes les routes sur `app/error.tsx` pour une carte
- * décorative.
+ * La panne est décidée *dans* la portée, et pas autour : Next remplit ces
+ * caches au `build`, où lever ferait échouer l'export dès que Strapi n'écoute
+ * pas. Le `cacheLife('seconds')` de la branche d'échec évite ce que la découpe
+ * d'avant évitait — une carte qui annonce encore la panne une heure après le
+ * retour de Strapi. Et une panne plutôt qu'une exception : le rail est monté
+ * dans le layout, où lever ferait tomber toutes les routes sur `app/error.tsx`
+ * pour une carte décorative.
  */
 export const fetchTopOfWeek = async (
   type: DiscussionType,
   limit: number,
 ): Promise<TopOfWeek> => {
+  "use cache";
+  cacheTag(topOfWeekTag(type));
+
   try {
-    return { discussions: await readTopOfWeek(type, limit) };
+    const { data } = await strapiFetch<StrapiCollection<Discussion>>(
+      "/discussions",
+      {
+        query: {
+          filters: {
+            type: { $eq: type },
+            createdAt: { $gte: new Date(Date.now() - WEEK_MS).toISOString() },
+          },
+          fields: DISCUSSION_FIELDS,
+          populate: DISCUSSION_POPULATE,
+          /* `createdAt` départage, comme l'onglet « tendances » : Postgres ne
+             garantit aucun ordre entre ex æquo, et la plus récente doit
+             gagner. */
+          sort: ["replyCount:desc", "createdAt:desc"],
+          pagination: { pageSize: limit },
+        },
+      },
+    );
+
+    cacheLife({ stale: 300, revalidate: 900, expire: 3600 });
+
+    return { discussions: data };
   } catch {
+    cacheLife("seconds");
+
     return { failed: true };
   }
 };
