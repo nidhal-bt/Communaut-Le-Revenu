@@ -8,7 +8,7 @@
     "console": "strapi console",
     "deploy": "strapi deploy",
     "db:up": "docker compose --env-file .env -f ../docker-compose.yml up -d --wait postgres",
-    "db:down": "docker compose --env-file .env -f ../docker-compose.yml down",
+    "db:down": "docker compose --env-file .env -f ../docker-compose.yml stop postgres",
     "db:reset": "docker compose --env-file .env -f ../docker-compose.yml down -v",
     "db:config": "docker compose --env-file .env -f ../docker-compose.yml config",
     "seed": "tsx scripts/seed-data.ts",

@@ -18,7 +18,8 @@ comment il est construit et comment le tester.
 Il faut au préalable :
 
 - **Node 22** (le backend accepte `>=20.0.0 <=26.x.x`) ;
-- **Docker**, pour la base PostgreSQL (`docker-compose.yml`, à la racine) ;
+- **Docker**, pour la base PostgreSQL — et, au choix, pour tout le projet
+  (`docker-compose.yml`, à la racine) ;
 - **npm** pour les deux applications. Chacune a son propre `package-lock.json` et son propre
   arbre `node_modules` : les installer séparément, jamais depuis la racine.
 
@@ -28,7 +29,7 @@ cd "Communauté Le Revenu"
 
 # Variables d'environnement : un fichier par application
 cp backend/.env.example backend/.env
-cp frontend/.env.example frontend/.env.local
+cp frontend/.env.example frontend/.env
 
 # Dépendances : une installation par application
 cd backend  && npm install  && cd ..
@@ -55,6 +56,44 @@ documentaire des variables des deux côtés, décrites par nom, avec leurs valeu
 
 ## 2. Lancer
 
+### Avec Docker — une seule commande
+
+Tout le projet, base comprise, en trois conteneurs :
+
+```sh
+docker compose --env-file backend/.env up -d --build
+```
+
+Le `--env-file` n'est pas facultatif : Compose ne charge automatiquement qu'un `.env` posé à
+côté du fichier compose, et il n'y en a pas à la racine. `backend/.env` reste donc la source
+unique du nom de la base, de l'utilisateur et du mot de passe.
+
+Les services démarrent dans l'ordre, chacun attendant que le précédent soit *healthy* :
+`postgres` (sonde `pg_isready`), puis `backend` (sonde `/_health`), puis `frontend`. Le premier
+`--build` prend plusieurs minutes : `strapi build` compile le panneau d'administration et
+`next build` compile le site.
+
+Ensuite, le contenu de démo, puis l'arrêt :
+
+```sh
+docker compose --env-file backend/.env exec backend npm run seed
+
+docker compose --env-file backend/.env down      # arrête, garde les données
+docker compose --env-file backend/.env down -v   # arrête et détruit le volume PostgreSQL
+```
+
+Deux pièges à connaître :
+
+- `/admin` demande toujours de créer le premier administrateur à la main. Le seed crée des
+  **membres**, pas des administrateurs.
+- `NEXT_PUBLIC_STRAPI_URL` est **figée dans le bundle au moment du build** de l'image frontend :
+  c'est l'URL que le navigateur appelle (`http://localhost:1337`). Le rendu serveur, lui, passe
+  par `STRAPI_INTERNAL_URL` (`http://backend:1337`), injectée au démarrage par Compose, parce
+  qu'un conteneur ne joint pas Strapi sur son propre `localhost`. Changer `BACKEND_PORT` impose
+  donc un `up --build`, pas un simple `up`.
+
+### En local, sans Docker
+
 Trois terminaux, dans cet ordre :
 
 ```sh
@@ -68,11 +107,12 @@ cd backend && npm run seed
 cd frontend && npm run dev
 ```
 
-Le seul fichier compose est `docker-compose.yml`, à la racine, et il ne lance que
-PostgreSQL. On ne l'appelle pas à la main : les scripts `db:*` de `backend/package.json` le
-pilotent, en lui passant `backend/.env` par `--env-file` — c'est de là que viennent le nom de
-la base, l'utilisateur et le mot de passe. `npm run db:config` affiche la configuration résolue
-sans rien démarrer, pour vérifier que ces valeurs sont bien lues.
+Dans ce mode, du fichier compose on ne lance que le service `postgres`, et jamais à la main :
+les scripts `db:*` de `backend/package.json` le pilotent, en lui passant `backend/.env` par
+`--env-file` — c'est de là que viennent le nom de la base, l'utilisateur et le mot de passe.
+`npm run db:up` et `npm run db:down` nomment explicitement `postgres`, donc ils ne touchent
+jamais aux conteneurs `backend` et `frontend`. `npm run db:config` affiche la configuration
+résolue sans rien démarrer, pour vérifier que ces valeurs sont bien lues.
 
 ### Adresses
 
