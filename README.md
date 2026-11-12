@@ -18,7 +18,7 @@ comment il est construit et comment le tester.
 Il faut au préalable :
 
 - **Node 22** (le backend accepte `>=20.0.0 <=26.x.x`) ;
-- **Docker**, pour la base PostgreSQL (`backend/docker-compose.yml`) ;
+- **Docker**, pour la base PostgreSQL (`docker-compose.yml`, à la racine) ;
 - **npm** pour les deux applications. Chacune a son propre `package-lock.json` et son propre
   arbre `node_modules` : les installer séparément, jamais depuis la racine.
 
@@ -36,7 +36,7 @@ cd frontend && npm install  && cd ..
 ```
 
 Les valeurs livrées dans `backend/.env.example` suffisent en local : les secrets y valent
-`tobemodified`, et les identifiants de base de données sont ceux que `backend/docker-compose.yml`
+`tobemodified`, et les identifiants de base de données sont ceux que `docker-compose.yml`
 lit pour créer le conteneur — les deux fichiers restent donc cohérents sans rien éditer. Pour un
 déploiement, remplacer tous les secrets.
 
@@ -68,8 +68,11 @@ cd backend && npm run seed
 cd frontend && npm run dev
 ```
 
-Il n'existe pas de `docker-compose.yml` à la racine : le seul fichier compose est
-`backend/docker-compose.yml`, et il ne lance que PostgreSQL.
+Le seul fichier compose est `docker-compose.yml`, à la racine, et il ne lance que
+PostgreSQL. On ne l'appelle pas à la main : les scripts `db:*` de `backend/package.json` le
+pilotent, en lui passant `backend/.env` par `--env-file` — c'est de là que viennent le nom de
+la base, l'utilisateur et le mot de passe. `npm run db:config` affiche la configuration résolue
+sans rien démarrer, pour vérifier que ces valeurs sont bien lues.
 
 ### Adresses
 
