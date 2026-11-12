@@ -1,3 +1,4 @@
+import { TriangleAlert } from "lucide-react";
 import { StateCard } from "@/components/state-card";
 import type { FeedTabKey, FeedView } from "@/lib/feed-tabs";
 import type { Discussion } from "@/types/models";
@@ -7,6 +8,18 @@ import { DiscussionRow, DiscussionRowHeader } from "./discussion-row";
 /** Coquille du fil, partagée avec le squelette pour qu'ils ne divergent pas. */
 export const FEED_SHELL =
   "overflow-hidden rounded-lg border bg-card shadow-card";
+
+/**
+ * Distincte du fil vide : « Rien ici pour l'instant » inviterait à publier alors
+ * que rien ne peut partir.
+ */
+const FeedError = () => (
+  <StateCard
+    icon={<TriangleAlert className="size-5" />}
+    title="Le fil n'a pas pu être chargé"
+    description="La communauté est momentanément injoignable. Réessayez dans un instant."
+  />
+);
 
 const FeedEmpty = ({ tab }: { tab: FeedTabKey }) => {
   const answered = tab === "sans-reponse";
@@ -31,9 +44,12 @@ type FeedListProps = {
   discussions: Discussion[];
   view: FeedView;
   tab: FeedTabKey;
+  failed?: boolean;
 };
 
-export const FeedList = ({ discussions, view, tab }: FeedListProps) => {
+export const FeedList = ({ discussions, view, tab, failed }: FeedListProps) => {
+  if (failed) return <FeedError />;
+
   if (!discussions.length) return <FeedEmpty tab={tab} />;
 
   if (view === "compact") {

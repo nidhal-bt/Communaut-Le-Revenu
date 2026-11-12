@@ -6,13 +6,12 @@ import { strapiFetch } from "./client";
 import { categoryTag } from "./tags";
 
 /**
- * Sans argument, il n'existe qu'une clé : afficher l'accueil n'interroge Strapi
- * qu'une fois, pour le rail comme pour le composer. `revalidate` est ce qui rend
- * le cache acceptable — un backend éteint ne fige `[]` que cinq minutes.
+ * Sans argument, il n'existe qu'une clé : l'accueil n'interroge Strapi qu'une fois,
+ * pour le rail comme pour le composer. `cacheLife` par branche, pour ne pas figer
+ * `[]` le temps du profil long.
  */
 export const fetchCategories = async (): Promise<Category[]> => {
   "use cache";
-  cacheLife({ stale: 300, revalidate: 300, expire: 900 });
 
   try {
     const { data } = await strapiFetch<StrapiCollection<Category>>(
@@ -20,8 +19,12 @@ export const fetchCategories = async (): Promise<Category[]> => {
       { query: { sort: ["name:asc"] } },
     );
 
+    cacheLife({ stale: 300, revalidate: 300, expire: 900 });
+
     return data;
   } catch {
+    cacheLife("seconds");
+
     return [];
   }
 };
@@ -54,7 +57,6 @@ export const fetchCategoryStats = async (
   slug: string,
 ): Promise<CategoryStats> => {
   "use cache";
-  cacheLife({ stale: 30, revalidate: 60, expire: 300 });
   /* Les deux totaux bougent dès qu'un membre publie ici : même étiquette que son fil. */
   cacheTag(categoryTag(slug));
 
@@ -74,11 +76,15 @@ export const fetchCategoryStats = async (
       }),
     ]);
 
+    cacheLife({ stale: 30, revalidate: 60, expire: 300 });
+
     return {
       discussions: discussions.meta.pagination.total,
       replies: replies.meta.pagination.total,
     };
   } catch {
+    cacheLife("seconds");
+
     return { discussions: 0, replies: 0 };
   }
 };

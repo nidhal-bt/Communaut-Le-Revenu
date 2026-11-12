@@ -85,4 +85,26 @@ describe("FeedList", () => {
     expect(screen.getByText("12")).toBeInTheDocument();
     expect(screen.getByText("0")).toBeInTheDocument();
   });
+
+  it("annonce la panne au lieu d'un fil vide", () => {
+    render(<FeedList discussions={[]} view="comfy" tab="tendances" failed />);
+
+    expect(
+      screen.getByRole("heading", { name: "Le fil n'a pas pu être chargé" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText("Rien ici pour l'instant"),
+    ).not.toBeInTheDocument();
+  });
+
+  it("affiche l'état vide quand la lecture a réussi sans rien ramener", () => {
+    render(<FeedList discussions={[]} view="comfy" tab="tendances" />);
+
+    expect(
+      screen.getByRole("heading", { name: "Rien ici pour l'instant" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText("Le fil n'a pas pu être chargé"),
+    ).not.toBeInTheDocument();
+  });
 });

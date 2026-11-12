@@ -1,9 +1,8 @@
 /**
  * Next remplit les portées `use cache` au `build` : une portée qui lève y fait
- * échouer l'export dès que Strapi n'écoute pas. L'échec est donc renvoyé en
- * valeur et jamais levé, et `cacheLife` est appelé par branche — le profil réel
- * après une lecture réussie, `cacheLife("seconds")` dans le `catch`, pour ne pas
- * figer une panne le temps du profil long. Exactement un appel par invocation.
+ * échouer l'export dès que Strapi n'écoute pas. L'échec est donc renvoyé en valeur,
+ * et `cacheLife` est appelé par branche — un seul appel par invocation — pour ne pas
+ * figer une panne le temps du profil long.
  */
 
 import { cache } from "react";
@@ -37,12 +36,11 @@ const DISCUSSION_POPULATE = {
 
 const PAGE_SIZE = 20;
 
-export type DiscussionFeed = {
-  discussions: Discussion[];
-  pageCount: number;
-};
+/** Un fil vide et un backend éteint ne doivent pas se ressembler. */
+export type DiscussionFeed =
+  | { discussions: Discussion[]; pageCount: number }
+  | { failed: true };
 
-/** `stale: 30` est le plancher du routeur client : en dessous, la valeur est ignorée. */
 export const fetchDiscussions = async (
   tab: FeedTabKey,
   page: number,
@@ -50,7 +48,6 @@ export const fetchDiscussions = async (
   categorySlug?: string,
 ): Promise<DiscussionFeed> => {
   "use cache";
-  cacheLife({ stale: 30, revalidate: 60, expire: 300 });
   /* `categorySlug` sépare déjà les entrées : l'étiquette suit la clé, et
      publier dans un espace ne périme pas le fil des autres. */
   cacheTag(categorySlug ? categoryTag(categorySlug) : HOME_FEED_TAG);
@@ -68,9 +65,14 @@ export const fetchDiscussions = async (
       },
     );
 
+    /* `stale: 30` est le plancher du routeur client : en dessous, c'est ignoré. */
+    cacheLife({ stale: 30, revalidate: 60, expire: 300 });
+
     return { discussions: data, pageCount: meta.pagination.pageCount };
   } catch {
-    return { discussions: [], pageCount: 0 };
+    cacheLife("seconds");
+
+    return { failed: true };
   }
 };
 

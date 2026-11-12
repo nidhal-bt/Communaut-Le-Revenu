@@ -20,14 +20,17 @@ export const RelatedDiscussions = async ({
   category: Category;
   excludeDocumentId: string;
 }) => {
-  const { discussions } = await fetchDiscussions(
+  const feed = await fetchDiscussions(
     "tendances",
     DEFAULT_FEED_PAGE,
     undefined,
     category.slug,
   );
 
-  const related = discussions
+  /* Bloc décoratif : une panne le fait disparaître plutôt que de s'annoncer. */
+  if ("failed" in feed) return null;
+
+  const related = feed.discussions
     .filter((discussion) => discussion.documentId !== excludeDocumentId)
     .slice(0, 3);
 

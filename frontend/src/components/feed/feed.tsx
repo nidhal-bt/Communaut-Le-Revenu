@@ -17,6 +17,7 @@ type FeedProps = {
   pageCount: number;
   tab: FeedTabKey;
   category?: string;
+  failed?: boolean;
 };
 
 /**
@@ -29,6 +30,7 @@ export const Feed = ({
   pageCount,
   tab,
   category,
+  failed,
 }: FeedProps) => {
   const [view, setView] = useState<FeedView>(DEFAULT_FEED_VIEW);
 
@@ -39,7 +41,12 @@ export const Feed = ({
         <FeedViewToggle view={view} onViewChange={setView} />
       </div>
 
-      <FeedList discussions={discussions} view={view} tab={tab} />
+      <FeedList
+        discussions={discussions}
+        view={view}
+        tab={tab}
+        failed={failed}
+      />
 
       <FeedPagination pageCount={pageCount} />
     </div>
