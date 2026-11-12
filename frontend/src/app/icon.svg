@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" role="img">
+  <title>Communauté Le Revenu</title>
+  <rect width="32" height="32" rx="7.6" fill="#eb0f0f" />
+  <text
+    x="16"
+    y="16.6"
+    text-anchor="middle"
+    dominant-baseline="central"
+    fill="#ffffff"
+    font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif"
+    font-weight="900"
+    font-size="21"
+    letter-spacing="-0.4"
+  >R</text>
+</svg>
