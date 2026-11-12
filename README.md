@@ -173,10 +173,9 @@ Category 1──n Discussion n──1 User (auteur)
                    └──n Reply n──1 User (auteur)
 ```
 
-L'identité visuelle est dérivée de `maquette-communaute-le-revenu.html`, à la racine, qui sert de
-référence de design et n'est jamais modifiée. Les décisions ci-dessous sont résumées ; le détail
-d'implémentation vit dans [`backend/CLAUDE.md`](backend/CLAUDE.md) et
-[`frontend/CLAUDE.md`](frontend/CLAUDE.md), écrits pour des agents de code.
+L'identité visuelle est dérivée de la maquette HTML fournie avec l'énoncé, qui sert de référence de
+design et n'est jamais modifiée — elle n'est pas versionnée ici. Les décisions ci-dessous sont
+résumées ; le détail d'implémentation est commenté dans le code, à l'endroit qu'il concerne.
 
 ### Backend
 
@@ -187,6 +186,11 @@ d'implémentation vit dans [`backend/CLAUDE.md`](backend/CLAUDE.md) et
   base dans `up_permissions`, qu'aucun fichier ne suit, et `src/bootstrap/permissions.ts` les
   attribue au premier démarrage. Corollaire : éditer ce fichier n'a aucun effet sur une base déjà
   initialisée.
+- **`update` et `delete` sont fermés à double tour.** Aucun rôle ne les reçoit, ils répondent donc
+  403 ; et la policy `global::is-owner` les garde malgré tout, en relisant l'auteur du document pour
+  refuser quiconque n'est pas lui. C'est ce qui évite qu'une case cochée dans `/admin` n'ouvre la
+  modification du contenu d'autrui. Le type de contenu vient de la configuration de la route, de
+  sorte qu'une seule policy serve les discussions et les réponses.
 - **La validation vit dans Strapi**, indépendamment du front : longueurs, type, existence de
   l'espace, avec des messages **en français** sous `error.details.errors`, champ par champ. Le
   frontend les relaie tels quels.
@@ -274,7 +278,21 @@ Deux conséquences : la suite **écrit dans la base de développement sans pouvo
 `npm run db:reset` comme seule purge ; et comme éditer un fichier de `backend/` redémarre
 `strapi develop`, il faut laisser le serveur revenir avant de relancer les tests.
 
-### Frontend — `src/components/feed/feed-list.test.tsx`
+### Backend — `tests/is-owner.test.ts`
 
-Le fil affiche bien titres, auteurs et compteurs de réponses, dans ses **deux vues** (détaillée et
-compacte), y compris le compteur à zéro. C'est aujourd'hui le seul test du frontend.
+L'exception : la policy reçoit `strapi` en argument, donc un double suffit et les cinq cas —
+visiteur, route sans identifiant, document introuvable, document d'un autre membre, auteur —
+tournent **sans serveur ni base semée**.
+
+### Frontend — quatre fichiers
+
+`src/components/feed/feed-list.test.tsx` : le fil affiche bien titres, auteurs et compteurs de
+réponses, dans ses **deux vues** (détaillée et compacte), y compris le compteur à zéro ; et une
+liste vide donne l'état vide ou la carte de panne selon `failed`, puisque les deux arrivent avec
+exactement les mêmes données.
+
+Trois suites unitaires couvrent ensuite les fonctions pures dont le reste dépend :
+`src/lib/discussion-slug.test.ts` (l'adresse d'une discussion, et le retour au `documentId`),
+`src/lib/feed-url.test.ts` (les pages refusées, les paramètres à leur valeur par défaut qui ne
+s'écrivent pas) et `src/lib/feed-tabs.test.ts` (le tri de chaque onglet, et le filtre d'espace qui
+s'**ajoute** à celui de l'onglet au lieu de le remplacer).
