@@ -1,16 +1,17 @@
 import { Suspense } from "react";
-import { BookOpen, ExternalLink, House, LayoutGrid, Trophy } from "lucide-react";
+import { ExternalLink, House, LayoutGrid } from "lucide-react";
 import { NavLink } from "@/components/layout/nav-link";
 import { SITE_URL } from "@/components/layout/site-bar";
 import { SpaceTile } from "@/components/space-tile";
 import { fetchCategories } from "@/lib/strapi/categories";
 
-/** « Classement » et « Charte » n'ont pas encore de route : ce sont des emplacements. */
+/**
+ * La maquette ajoute « Classement » et « Charte » : aucune route ne les sert, et un
+ * `href="#"` mentirait.
+ */
 const LINKS = [
   { href: "/", label: "Accueil", icon: House },
   { href: "/espaces", label: "Tous les espaces", icon: LayoutGrid },
-  { href: "#", label: "Classement", icon: Trophy },
-  { href: "#", label: "Charte", icon: BookOpen },
 ];
 
 const SECTION_TITLE =

@@ -1,9 +1,11 @@
 "use client";
 
 import { Suspense, useState } from "react";
-import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { LoginModal } from "@/components/auth/login-modal";
 import { useAuth } from "@/lib/auth/auth-context";
+import { cn } from "@/lib/utils";
 
 /**
  * Réservé aux visiteurs : connecté, la maquette remplace le hero par un « Bonjour
@@ -59,14 +61,17 @@ const HeroBody = () => {
           >
             Rejoindre gratuitement
           </Button>
-          {/* « Explorer les espaces » reste présentationnel : aucun `href`. */}
-          <Button
-            variant="ghost"
-            size="lg"
-            className="border-hero-foreground/18 bg-hero-foreground/14 px-4 text-hero-foreground backdrop-blur-[10px] hover:bg-hero-foreground/24 hover:text-hero-foreground"
+          {/* Un `Link` habillé en bouton : c'est une navigation, et le
+              préchargement du routeur vient avec. */}
+          <Link
+            href="/espaces"
+            className={cn(
+              buttonVariants({ variant: "ghost", size: "lg" }),
+              "border-hero-foreground/18 bg-hero-foreground/14 px-4 text-hero-foreground backdrop-blur-[10px] hover:bg-hero-foreground/24 hover:text-hero-foreground",
+            )}
           >
             Explorer les espaces
-          </Button>
+          </Link>
         </div>
       </section>
 
