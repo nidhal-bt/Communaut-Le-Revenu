@@ -20,14 +20,9 @@ type FeedProps = {
 };
 
 /**
- * Tient la densité d'affichage pour la barre et la liste à la fois.
- *
- * C'est le seul état de ce sous-arbre : basculer détaillé / compact ne redemande
- * rien au serveur, les discussions sont déjà là. Le choix n'est pas mémorisé —
- * un rechargement repart en vue détaillée.
- *
- * La session n'est lue ni ici ni dans le sélecteur de densité, seulement dans
- * l'onglet membre : le fil entier n'attend donc jamais le cookie.
+ * Le seul état de ce sous-arbre : basculer détaillé / compact ne redemande rien au
+ * serveur, et le choix n'est pas mémorisé. La session n'est lue que dans l'onglet
+ * membre, donc le fil entier n'attend jamais le cookie.
  */
 export const Feed = ({
   discussions,

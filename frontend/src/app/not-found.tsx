@@ -4,12 +4,9 @@ import { StateCard } from "@/components/state-card";
 import { Button } from "@/components/ui/button";
 
 /**
- * Le 404 de toute l'application : ce fichier répond aussi bien aux `notFound()`
- * des pages d'espace et de discussion qu'à une URL que rien ne route.
- *
  * `global-not-found.tsx` est écarté : encore expérimental, il demande le drapeau
  * `experimental.globalNotFound` et contourne le layout — il faudrait y réimporter
- * styles et polices pour rien, l'application n'ayant qu'un seul layout racine.
+ * styles et polices pour rien.
  */
 export const metadata: Metadata = {
   title: "Page introuvable",

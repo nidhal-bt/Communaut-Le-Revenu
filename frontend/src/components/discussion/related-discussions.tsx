@@ -6,15 +6,12 @@ import type { Category } from "@/types/models";
 import { SECTION_TITLE } from "./post-shell";
 
 /**
- * « À lire aussi dans {espace} » : trois discussions du même espace.
+ * Les arguments sont exactement ceux que la page d'un espace passe déjà pour sa
+ * **première** page : la lecture partage donc son entrée de cache et ne coûte
+ * aucune requête supplémentaire.
  *
- * `tendances` trie par nombre de réponses puis par date, ce dont le `hot()` de
- * la maquette s'approche. Les arguments sont exactement ceux que la page d'un
- * espace passe déjà pour sa **première** page : la lecture partage donc son
- * entrée de cache et ne coûte aucune requête supplémentaire.
- *
- * Le filtre vient avant la coupe — couper d'abord laisserait deux cartes
- * lorsque trois existent.
+ * Le filtre vient avant la coupe — couper d'abord laisserait deux cartes lorsque
+ * trois existent.
  */
 export const RelatedDiscussions = async ({
   category,

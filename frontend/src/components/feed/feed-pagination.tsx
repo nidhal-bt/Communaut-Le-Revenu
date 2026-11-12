@@ -17,11 +17,8 @@ import { feedHref, resolveFeedPage } from "@/lib/feed-url";
 const NEIGHBOURS = 2;
 
 /**
- * Les numéros à afficher : la première page, la dernière, et le voisinage de la
- * courante.
- *
- * Un `Set` plutôt qu'un assemblage de plages : les trois morceaux se
- * chevauchent dès qu'on approche d'un bord, et c'est lui qui dédoublonne.
+ * Un `Set` plutôt qu'un assemblage de plages : les trois morceaux se chevauchent
+ * dès qu'on approche d'un bord, et c'est lui qui dédoublonne.
  */
 const pagesToShow = (current: number, pageCount: number): number[] => {
   const pages = new Set<number>([1, pageCount]);
@@ -34,14 +31,9 @@ const pagesToShow = (current: number, pageCount: number): number[] => {
 };
 
 /**
- * Le pager du fil : « Précédent », une fenêtre de numéros, « Suivant ».
- *
  * La page courante est relue de l'URL au lieu de descendre en prop, comme
- * `FeedTabs` le fait pour l'onglet : `Feed` n'a donc rien à faire traverser.
- *
- * `usePathname` et `useSearchParams` ne sont pas pré-rendables, mais la page
- * entoure déjà tout `FeedSection` d'une frontière `<Suspense>` : une de plus
- * ici n'apporterait rien.
+ * `FeedTabs` le fait pour l'onglet. Ni `usePathname` ni `useSearchParams` ne sont
+ * pré-rendables, mais la page entoure déjà tout `FeedSection` d'une frontière.
  */
 export const FeedPagination = ({ pageCount }: { pageCount: number }) => {
   const pathname = usePathname();

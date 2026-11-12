@@ -3,10 +3,8 @@ import { ChevronRight } from "lucide-react";
 import type { Category } from "@/types/models";
 
 /**
- * La `.crumbs` de la maquette : Accueil ▸ espace.
- *
- * `category` est requis par le schéma, mais facultatif dans le type : sans lui,
- * le fil se réduit à « Accueil » plutôt que d'afficher un chevron orphelin.
+ * `category` est requis par le schéma mais facultatif dans le type : sans lui, le
+ * fil se réduit à « Accueil » plutôt que d'afficher un chevron orphelin.
  */
 export const DiscussionBreadcrumb = ({
   category,

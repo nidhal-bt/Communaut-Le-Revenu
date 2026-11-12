@@ -30,16 +30,12 @@ export const ReplyBoxSkeleton = () => (
 );
 
 /**
- * La `.reply-box` de la maquette.
- *
  * Non contrôlée, comme `login-modal.tsx` : l'action lit le `FormData`. Appel
- * impératif plutôt que `action={...}`, parce qu'on fait trois choses du
- * résultat — l'annoncer, vider le champ, garder le focus — et aucune ne demande
- * un effet.
+ * impératif plutôt que `action={...}`, parce qu'on fait trois choses du résultat et
+ * qu'aucune ne demande un effet.
  *
- * Écarté de la maquette : l'enregistrement automatique du brouillon, et l'outil
- * « Mentionner », qui demanderait la recherche de pseudo que le backend
- * n'expose pas.
+ * Écarté de la maquette : le brouillon automatique, et l'outil « Mentionner » qui
+ * demanderait la recherche de pseudo que le backend n'expose pas.
  */
 const ReplyBox = ({
   user,
@@ -140,12 +136,8 @@ const ReplyAreaBody = ({
 };
 
 /**
- * `useAuth` suspend : la zone porte sa propre frontière, sinon tout le fil
- * attendrait aussi la lecture du cookie.
- *
- * Le repli n'est pas `null`, contrairement à `join-card.tsx` : les deux
- * branches rendent une carte de hauteur comparable, et le vide ferait sauter la
- * page au moment de la bascule.
+ * Le repli n'est pas `null`, contrairement à `join-card.tsx` : les deux branches
+ * rendent une carte de hauteur comparable, et le vide ferait sauter la page.
  */
 export const ReplyArea = ({
   discussionDocumentId,

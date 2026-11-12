@@ -2,13 +2,7 @@ import type { StrapiErrorBody, StrapiQuery } from "@/types/strapi";
 import { STRAPI_API_URL } from "./config";
 import { buildQueryString } from "./query";
 
-/**
- * Erreur portant le corps `{ data: null, error: {...} }` de Strapi.
- *
- * `details` reste en `unknown` à dessein : les contrôleurs `create` y nichent
- * leurs erreurs de champ sous `details.errors`, et le typer ici reviendrait à
- * prétendre connaître la forme de toutes les erreurs.
- */
+/** `details` reste `unknown` : les contrôleurs `create` y nichent `details.errors`. */
 export class StrapiError extends Error {
   readonly status: number;
   readonly details: unknown;
@@ -29,9 +23,8 @@ export type StrapiFetchOptions = {
 };
 
 /**
- * Lit le corps d'erreur Strapi ; retombe sur le statut HTTP si ce n'est pas du
- * JSON. Exporté pour `auth.ts`, qui lance son `fetch` lui-même : la connexion a
- * besoin des en-têtes de réponse, que `strapiFetch` ne rend pas.
+ * Exporté pour `auth.ts`, qui lance son `fetch` lui-même : la connexion a besoin
+ * des en-têtes de réponse, que `strapiFetch` ne rend pas.
  */
 export const toStrapiError = async (
   response: Response,
@@ -55,33 +48,16 @@ export const toStrapiError = async (
 };
 
 /**
- * Appelle l'API REST Strapi et renvoie l'enveloppe désérialisée.
- *
- * ```ts
- * const page = await strapiFetch<StrapiCollection<Discussion>>("/discussions", {
- *   query: { populate: ["author", "category"], sort: ["createdAt:desc"] },
- * });
- * ```
- *
  * Le type de retour est une assertion, pas une validation : rien ne vérifie la
  * réponse à l'exécution.
  *
- * **Mise en cache.** `cacheComponents` est actif, et dans ce modèle le cache est
- * explicitement opt-in : un `fetch` nu n'est pas mis en cache. On ne force donc
- * aucun `cache` par défaut ici — ce serait redondant, et un `no-store` codé en
- * dur entrerait en conflit avec un appelant placé dans un `use cache` (Next
- * ignore alors les deux options et prévient en développement). Pour mettre en
- * cache, l'idiome est d'envelopper l'appelant dans `use cache` et de régler
- * `cacheLife` / `cacheTag`. Les options `cache` et `next` restent exposées pour
- * un réglage ponctuel.
+ * Aucun `cache` par défaut, à dessein : sous `cacheComponents` le cache est
+ * opt-in, donc un `fetch` nu n'est déjà pas mis en cache, et un `no-store` codé
+ * en dur entrerait en conflit avec un appelant placé dans un `use cache`. Pour
+ * mettre en cache, envelopper l'appelant et régler `cacheLife` / `cacheTag`.
  *
- * **Conséquence côté rendu :** un appel non mis en cache pendant le rendu doit
- * se trouver sous une frontière `<Suspense>`, sinon le build signale la route
- * comme bloquante. Voir `node_modules/next/dist/docs/01-app/01-getting-started/08-caching.md`.
- *
- * `credentials: "include"` est inutile pour les lectures publiques d'aujourd'hui
- * mais c'est ce qu'exigera le cookie de rafraîchissement httpOnly, d'après
- * `backend/CLAUDE.md`.
+ * Conséquence : un appel non mis en cache pendant le rendu doit se trouver sous
+ * une frontière `<Suspense>`, sinon le build signale la route comme bloquante.
  */
 export const strapiFetch = async <T>(
   path: string,

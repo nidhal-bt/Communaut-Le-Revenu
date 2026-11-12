@@ -8,12 +8,9 @@ import { useAuth } from "@/lib/auth/auth-context";
 import { RailCard } from "./rail-card";
 
 /**
- * Carte d'inscription, réservée aux visiteurs. Connecté, la maquette met « Votre
- * progression » à cette place — pas encore implémenté, la carte disparaît donc
- * sans rien afficher à la place, comme le hero.
- *
- * Les avantages sont ceux de la modale de connexion : les deux vendent la même
- * chose, autant ne pas les laisser diverger.
+ * Réservée aux visiteurs : connecté, la maquette met « Votre progression » ici, pas
+ * encore implémenté. Les avantages sont ceux de la modale de connexion — les deux
+ * vendent la même chose, autant ne pas les laisser diverger.
  */
 const JoinCardBody = () => {
   const { isAuth } = useAuth();
@@ -56,10 +53,7 @@ const JoinCardBody = () => {
   );
 };
 
-/**
- * Même raison que le hero : `useAuth` suspend, la carte ne s'affiche que pour
- * un visiteur, donc le repli vide est l'état final d'un membre.
- */
+/** Le repli est vide parce que c'est l'état final d'un membre, pas un squelette. */
 export const JoinCard = () => (
   <Suspense fallback={null}>
     <JoinCardBody />

@@ -10,12 +10,10 @@ type FeedViewToggleProps = {
 };
 
 /**
- * Le `seg-ic` de la maquette : deux densités d'affichage, détaillée ou compacte.
- *
- * Volontairement séparé de la barre d'onglets et sans aucune lecture de session
- * ni de l'URL : il s'hydrate donc avec `Feed`, au-dessus de toute frontière
- * `<Suspense>`. Tant qu'il vivait sous celle de `FeedTabs`, le clic restait
- * inerte le temps que le cookie de session soit lu.
+ * Volontairement séparé de la barre d'onglets et sans aucune lecture de session ni
+ * de l'URL : il s'hydrate donc avec `Feed`, au-dessus de toute frontière. Tant
+ * qu'il vivait sous celle de `FeedTabs`, le clic restait inerte le temps que le
+ * cookie soit lu.
  */
 export const FeedViewToggle = ({ view, onViewChange }: FeedViewToggleProps) => (
   <div

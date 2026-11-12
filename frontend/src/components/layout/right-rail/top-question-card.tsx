@@ -11,20 +11,12 @@ const TITLE = "Question de la semaine";
 const ICON = <Star />;
 
 /**
- * Bloc « question de la semaine » : la question la plus commentée des sept
- * derniers jours, puis sa dernière réponse.
+ * La maquette met en avant une question choisie à la main et sa réponse la mieux
+ * notée. Ni le drapeau ni la notation n'existent dans le modèle : la question est
+ * déduite du classement, et « la mieux notée » devient « la plus récente ».
  *
- * La maquette met en avant une question choisie à la main (`featured`, signée
- * « LaRedaction ») et sa réponse la mieux notée. Ni le drapeau ni la notation
- * n'existent dans le modèle de données : la question est donc déduite du
- * classement, et « la mieux notée » devient « la plus récente ».
- *
- * La réponse n'est lue que si le compteur est non nul : une question sans
- * réponse ne coûte alors pas une seconde requête, et le bloc se replie.
- *
- * Écarté de la maquette : le bouton « Je réponds », qui demanderait une route
- * vers la zone de réponse, et la pile des quatre premiers répondants, qui
- * demanderait l'auteur de chaque réponse pour une rangée décorative.
+ * La réponse n'est lue que si le compteur est non nul : une question sans réponse
+ * ne coûte alors pas une seconde requête.
  */
 export const TopQuestionCard = async () => {
   const result = await fetchTopOfWeek("question", 1);
@@ -82,11 +74,6 @@ export const TopQuestionCard = async () => {
   );
 };
 
-/**
- * Le repli de la carte : les barres qui tenaient la place avant que l'API ne
- * serve le bloc. Deux pour le titre, puis l'avatar et trois lignes pour la
- * réponse — la silhouette de ce que rend `TopQuestionCard`.
- */
 export const TopQuestionCardSkeleton = () => (
   <RailCard title={TITLE} icon={ICON}>
     <div className="flex flex-col gap-2">

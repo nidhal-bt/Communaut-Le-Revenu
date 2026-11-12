@@ -16,19 +16,15 @@ import { useAuth } from "@/lib/auth/auth-context";
 import { cn } from "@/lib/utils";
 
 /**
- * Barre de navigation basse de la maquette (`#bnav`), affichée seulement sur
- * mobile : le rail gauche la remplace à partir de `md`. Le `pb-24` de la
- * grille du layout dégage la hauteur qu'elle occupe.
- *
- * La maquette bascule à 760px, on garde `md:` (768px) comme `side-nav.tsx`
- * pour que les deux navigations s'échangent au même point de rupture.
+ * Affichée seulement sur mobile ; le `pb-24` de la grille du layout dégage sa
+ * hauteur. La maquette bascule à 760px, on garde `md:` (768px) comme
+ * `side-nav.tsx` pour que les deux navigations s'échangent au même point.
  */
 const LINKS = [
   { href: "/", label: "Accueil", icon: House },
   { href: "/espaces", label: "Espaces", icon: LayoutGrid },
 ];
 
-/** Gabarit commun des cinq cellules de la barre. */
 const CELL =
   "flex min-w-[56px] flex-col items-center gap-0.5 px-2 py-1 text-[11px] text-muted-foreground";
 
@@ -55,9 +51,8 @@ const ActiveNavCell = (props: CellLink) => (
 );
 
 /**
- * Même construction que `nav-link.tsx` du rail, et pour la même raison :
- * `usePathname` est une donnée de requête, qui bloque le pré-rendu si elle
- * n'est pas isolée. Le repli est la cellule non surlignée, pas un squelette.
+ * Comme `nav-link.tsx` : `usePathname` est une donnée de requête, qui bloque le
+ * pré-rendu si elle n'est pas isolée. Le repli est la cellule non surlignée.
  */
 const NavCell = (props: CellLink) => (
   <Suspense fallback={<NavCellShell {...props} active={false} />}>
@@ -65,10 +60,7 @@ const NavCell = (props: CellLink) => (
   </Suspense>
 );
 
-/**
- * Les deux cellules de droite sont les seules à dépendre de la session : les
- * isoler évite que `useAuth` retienne les liens et le bouton de publication.
- */
+/** Les isoler évite que `useAuth` retienne les liens et le bouton de publication. */
 const AccountCells = () => {
   const { isAuth } = useAuth();
   const [loginOpen, setLoginOpen] = useState(false);
@@ -103,7 +95,6 @@ const AccountCells = () => {
   );
 };
 
-/** Deux cellules muettes, aux mêmes dimensions, le temps de lire le cookie. */
 const AccountCellsSkeleton = () => (
   <>
     {[0, 1].map((index) => (

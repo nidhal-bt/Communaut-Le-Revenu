@@ -35,19 +35,15 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${inter.variable} ${playfair.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
-        {/* La promesse n'est pas attendue ici : un `await` sur le cookie de
-            session retiendrait tout le layout, `{children}` compris, derrière la
-            requête. Chaque composant qui a besoin du membre la dénoue sous sa
-            propre frontière `<Suspense>`. */}
+        {/* La promesse n'est pas attendue ici : un `await` sur le cookie
+            retiendrait tout le layout, `{children}` compris. Chaque composant qui
+            a besoin du membre la dénoue sous sa propre frontière. */}
         <AuthProvider sessionUser={getSessionUser()}>
           <SiteBar />
-          {/* Même règle que la session : la promesse n'est pas attendue ici.
-              La lecture est mise en cache sans argument, elle partage donc son
-              entrée avec le rail gauche — l'en-tête ne coûte pas une requête
-              de plus. */}
+          {/* Lecture mise en cache sans argument : l'en-tête partage son entrée
+              avec le rail gauche et ne coûte pas une requête de plus. */}
           <Navbar categories={fetchCategories()} />
-          {/* Grille de la maquette : 212px / contenu / 304px, gouttière 28px.
-              Trois paliers qui ne se recouvrent pas, pour qu'aucune règle n'en
+          {/* Trois paliers qui ne se recouvrent pas, pour qu'aucune règle n'en
               écrase une autre :
                 < 768px   une colonne implicite, tout s'empile ;
                 768-1180  deux colonnes, le rail passe sous le contenu ;
@@ -58,13 +54,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             <RightRail className="md:max-wide:col-start-2" />
           </div>
           <BottomNav />
-          {/* Monté une seule fois, hors de la grille : toute Server Action
-              annonce son résultat ici.
-
-              Les deux décalages portent la même valeur : la barre du bas est
-              fixée au coin inférieur jusqu'à `md` (768px), alors que sonner
-              bascule sur `mobileOffset` à 600px — un seul des deux laisserait
-              la notification sous la barre entre les deux seuils. */}
+          {/* Les deux décalages portent la même valeur : la barre du bas est fixée
+              jusqu'à `md` (768px) alors que sonner bascule sur `mobileOffset` à
+              600px — un seul des deux laisserait la notification sous la barre. */}
           <Toaster
             position="bottom-right"
             offset={{ bottom: 84 }}

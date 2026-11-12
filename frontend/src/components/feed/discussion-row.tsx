@@ -23,12 +23,7 @@ export const DiscussionRowHeader = () => (
   </div>
 );
 
-/**
- * La `.trow` de la maquette : une discussion par ligne, chiffres en colonnes.
- *
- * La colonne « Vues » de la maquette est écartée — il n'existe aucun compteur
- * de vues dans le modèle de données.
- */
+/** La colonne « Vues » de la maquette est écartée : aucun compteur de vues en base. */
 export const DiscussionRow = ({ discussion }: { discussion: Discussion }) => {
   const { title, type, category, author, updatedAt } = discussion;
   const replyCount = discussion.replyCount ?? 0;

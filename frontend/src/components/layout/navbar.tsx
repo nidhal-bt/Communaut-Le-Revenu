@@ -10,11 +10,7 @@ import { PublishButton } from "@/components/composer/publish-button";
 import { useAuth } from "@/lib/auth/auth-context";
 import type { Category } from "@/types/models";
 
-/**
- * Logotype reconstitué d'après la home de lerevenu.com : un bloc rouge
- * contenant « LE » sur fond noir puis « REVENU ».
- * À remplacer par le SVG officiel à l'intégration.
- */
+/** Logotype reconstitué d'après lerevenu.com, à remplacer par le SVG officiel. */
 const Wordmark = () => (
   <span
     aria-hidden
@@ -30,13 +26,9 @@ const Wordmark = () => (
 );
 
 /**
- * Le seul bloc de l'en-tête qui dépend de la session, isolé pour cette raison :
- * `useAuth` suspend le temps de lire le cookie, et le logotype comme la
- * recherche n'ont aucune raison d'attendre avec lui.
- *
- * La liste des espaces arrive en promesse et se dénoue ici, sous la même
- * frontière : le composer en a besoin pour son select, et l'en-tête n'a pas à
- * attendre deux fois.
+ * Le seul bloc de l'en-tête qui dépend de la session, isolé pour cette raison : le
+ * logotype et la recherche n'ont aucune raison d'attendre le cookie. La liste des
+ * espaces se dénoue sous la même frontière, pour ne pas attendre deux fois.
  */
 const NavbarActions = ({
   categories,

@@ -6,24 +6,16 @@ import {
 import type { DiscussionType } from "@/types/models";
 
 /**
- * Les types de publication proposés par le composer.
- *
- * La maquette en affiche trois — question, discussion, sondage. Le sondage est
- * écarté ici : l'enum du backend ne connaît que `question` et `discussion`, et
- * un sondage demanderait en plus un type de contenu « réponses / votes » qui
- * n'existe pas.
- *
- * Le libellé court alimente la barre, le titre et l'accroche alimentent les
- * cartes de la modale : une seule source, pour que les deux ne divergent pas.
+ * La maquette affiche aussi un sondage, écarté ici : l'enum du backend ne connaît
+ * que `question` et `discussion`, et un sondage demanderait en plus un type de
+ * contenu « réponses / votes » qui n'existe pas.
  */
 export type DiscussionTypeOption = {
   value: DiscussionType;
   icon: LucideIcon;
-  /** Libellé du raccourci dans la barre. */
   shortLabel: string;
   cardTitle: string;
   cardHint: string;
-  /** Exemple de titre, propre à chaque type. */
   titlePlaceholder: string;
 };
 

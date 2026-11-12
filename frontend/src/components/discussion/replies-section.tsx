@@ -7,19 +7,14 @@ import { ReplyItem } from "./reply-item";
 
 const ROWS = [0, 1];
 
-/** La pluralisation de la maquette, mot pour mot. */
 const headingFor = (total: number): string =>
   total === 0
     ? "Aucune réponse pour l'instant"
     : `${total} ${total === 1 ? "réponse" : "réponses"}`;
 
 /**
- * La `section.replies` de la maquette : le décompte, le fil, puis la zone de
- * réponse.
- *
- * `total` vient de `meta.pagination` et peut dépasser le nombre de réponses
- * lues : au-delà de cent, on le dit plutôt que de laisser croire que le fil est
- * complet.
+ * `total` vient de `meta.pagination` et peut dépasser le nombre de réponses lues :
+ * au-delà de cent, on le dit plutôt que de laisser croire que le fil est complet.
  */
 export const RepliesSection = ({
   replies,

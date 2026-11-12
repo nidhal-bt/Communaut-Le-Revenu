@@ -4,15 +4,14 @@ import { ErrorState } from "@/components/error-state";
 import "./globals.css";
 
 /**
- * Le dernier recours : `error.tsx` n'entoure pas le layout de son propre
- * segment, donc un layout qui lève n'est rattrapé que par ce fichier. Il
- * remplace le document entier, d'où le `<html>` et le `<body>`.
+ * Le dernier recours : `error.tsx` n'entoure pas le layout de son propre segment,
+ * donc un layout qui lève n'est rattrapé que par ce fichier. Il remplace le
+ * document entier, d'où le `<html>` et le `<body>`.
  *
- * `globals.css` est importé ici : ce document n'hérite pas des styles de
- * l'application. Un fichier client ne peut pas exporter `metadata`, le titre
- * passe donc par l'élément `<title>` de React. Et pas de `next/font` : les
- * variables de police vivent sur le `<html>` du layout, que l'on vient de
- * perdre — `--font-sans` part de la police système, l'affichage tient sans.
+ * `globals.css` est importé ici parce que ce document n'hérite pas des styles de
+ * l'application. Un fichier client ne peut pas exporter `metadata`, le titre passe
+ * donc par l'élément `<title>`. Et pas de `next/font` : les variables de police
+ * vivent sur le `<html>` du layout, que l'on vient de perdre.
  */
 export default function GlobalError({ retry }: { error: unknown; retry: () => void }) {
   return (

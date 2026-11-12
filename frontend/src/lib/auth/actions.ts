@@ -7,23 +7,15 @@ import type { User } from "@/types/models";
 import { clearSession, readSession, writeSession } from "./session";
 
 /**
- * Server Actions de l'authentification.
- *
- * Tout passe par ici parce que Next n'autorise l'écriture d'un cookie que dans
- * une Server Action ou un Route Handler. Effet de bord utile : le mot de passe
- * part du navigateur vers notre serveur, pas vers Strapi, et le jeton n'est
- * jamais exposé au JavaScript de la page.
- *
- * La rotation du jeton vit ailleurs : le jeton d'accès ne dure que 10 minutes
- * (voir `session.ts`), et `authenticated-fetch.ts` échange le jeton de rotation
- * dès qu'un appel de membre revient en 401.
+ * Le mot de passe part du navigateur vers notre serveur, jamais vers Strapi, et le
+ * jeton n'est jamais exposé au JavaScript de la page. La rotation vit ailleurs :
+ * `authenticated-fetch.ts` échange le jeton dès qu'un appel revient en 401.
  */
 
 export type LoginResult = { user: User } | { error: string };
 
 /**
- * Message affiché au lecteur. On ne relaie jamais `error.message` : Strapi
- * répond en anglais (« Invalid identifier or password ») et distinguer
+ * On ne relaie jamais `error.message` : Strapi répond en anglais, et distinguer
  * « compte inconnu » de « mot de passe faux » renseignerait un attaquant.
  */
 const messageFor = (error: unknown): string => {
@@ -62,19 +54,11 @@ export const loginAction = async (formData: FormData): Promise<LoginResult> => {
 };
 
 /**
- * Déconnexion.
+ * Notre cookie part **d'abord**, et lui seul décide : un backend éteint ou un jeton
+ * déjà expiré ne doit pas laisser le membre connecté chez nous.
  *
- * Notre cookie part **d'abord**, et c'est lui seul qui décide : un backend
- * éteint ou un jeton déjà expiré ne doit pas laisser le membre connecté chez
- * nous.
- *
- * La révocation chez Strapi suit, mais après la réponse (`after`) : elle n'a
- * aucune raison de retenir l'interface, et sans cela un backend injoignable
- * ferait attendre le membre le temps du timeout avant que l'en-tête ne
- * rebascule.
- *
- * Rien n'est renvoyé et rien n'est redirigé : toutes les pages sont publiques,
- * c'est donc à l'appelant de décider où il reste.
+ * La révocation chez Strapi suit, mais après la réponse (`after`) : sans cela un
+ * backend injoignable ferait attendre le membre le temps du timeout.
  */
 export const logoutAction = async (): Promise<void> => {
   const session = await readSession();
@@ -87,8 +71,7 @@ export const logoutAction = async (): Promise<void> => {
     try {
       await logout(session.jwt, session.refreshToken);
     } catch {
-      /* Au mieux : le cookie est déjà parti, il n'y a plus rien à rattraper ni
-         rien à annoncer à un membre déjà déconnecté de notre côté. */
+      /* Le cookie est déjà parti : plus rien à rattraper ni à annoncer. */
     }
   });
 };

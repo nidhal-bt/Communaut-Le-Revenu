@@ -11,20 +11,13 @@ import { Toaster as Sonner, type ToasterProps } from "sonner";
 import { cn } from "@/lib/utils";
 
 /**
- * Le `.toast` de la maquette, monté une seule fois dans `layout.tsx` : fond de
- * verre flouté, filet, ombre portée, 380px au plus.
+ * Deux écarts avec le composant généré par shadcn. `next-themes` en est retiré :
+ * l'application n'a pas de mode sombre, et `theme="system"` laissait sonner suivre
+ * `prefers-color-scheme` et poser une notification sombre sur une page claire.
  *
- * Deux écarts avec le composant généré par shadcn. `next-themes` en est
- * retiré : l'application n'a pas de mode sombre, donc pas de fournisseur de
- * thème, et `theme="system"` laissait sonner suivre `prefers-color-scheme` et
- * poser une notification sombre sur une page claire. Et la classe `cn-toast`
- * de son `toastOptions`, que rien ne définit dans `globals.css`, est tombée
- * avec.
- *
- * Le fond passe par les variables de sonner et non par une classe `bg-*` :
- * lui-même pose `background: var(--normal-bg)` sur la notification, et les
- * deux sélecteurs ont le même poids — la classe ne gagnerait que par l'ordre
- * des feuilles de style.
+ * Le fond passe par les variables de sonner et non par une classe `bg-*` : sonner
+ * pose `background: var(--normal-bg)` lui-même, et les deux sélecteurs ont le même
+ * poids — la classe ne gagnerait que par l'ordre des feuilles de style.
  */
 const Toaster = ({ toastOptions, ...props }: ToasterProps) => (
   <Sonner

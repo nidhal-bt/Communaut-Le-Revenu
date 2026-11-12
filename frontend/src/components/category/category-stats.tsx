@@ -2,12 +2,9 @@ import { formatCount } from "@/lib/format-count";
 import { fetchCategoryStats } from "@/lib/strapi/categories";
 
 /**
- * « N discussions · N réponses ».
- *
- * La maquette affiche un troisième chiffre, « N membres actifs ce mois-ci »,
- * qu'elle calcule en divisant les réponses par neuf : il est inventé. Écarté —
- * il n'existe aucun modèle d'activité, et un nombre qui a l'air dérivé vaut
- * moins que pas de nombre.
+ * La maquette affiche un troisième chiffre, « N membres actifs ce mois-ci », qu'elle
+ * calcule en divisant les réponses par neuf : il est inventé, et il n'existe aucun
+ * modèle d'activité. Écarté.
  */
 export const CategoryStats = async ({ slug }: { slug: string }) => {
   const { discussions, replies } = await fetchCategoryStats(slug);

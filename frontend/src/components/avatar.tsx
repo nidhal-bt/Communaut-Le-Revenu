@@ -9,9 +9,9 @@ const AVATAR_TINTS = [
 ];
 
 /**
- * Des tailles nommées plutôt qu'un ratio unique : dans la maquette, le rapport
- * police/boîte vaut 0,432 à 22px, 0,383 à 30px et 0,350 à 40px. Il n'est pas
- * constant, contrairement à celui de `SpaceTile`, où un seul `--s` suffit.
+ * Des tailles nommées plutôt qu'un ratio unique : dans la maquette le rapport
+ * police/boîte n'est pas constant (0,432 à 22px, 0,383 à 30px, 0,350 à 40px),
+ * contrairement à celui de `SpaceTile` où un seul `--s` suffit.
  */
 const AVATAR_SIZES = {
   xs: "size-[22px] text-[9.5px]",
@@ -31,7 +31,6 @@ export const tintFor = (username: string) => {
   return AVATAR_TINTS[sum % AVATAR_TINTS.length];
 };
 
-/** Le monogramme d'un membre : première lettre du pseudo sur sa teinte. */
 export const Avatar = ({
   username,
   size,

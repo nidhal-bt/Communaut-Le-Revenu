@@ -11,17 +11,10 @@ import {
 } from "./top-discussions-card";
 
 /**
- * Troisième colonne de la maquette (304px) : les blocs de la communauté.
- * La colonne n'est pas collante — seule la navigation de gauche l'est.
- *
- * Les deux cartes du haut lisent Strapi dans une portée `use cache`, qui se
- * résout au prérendu : elles arrivent donc dans la coquille statique et ces
- * frontières ne s'affichent normalement jamais. Elles sont le filet d'une
- * entrée froide et du premier rendu après une invalidation — et la garantie que
- * le rail, monté dans le layout, ne bloque aucune route.
- *
- * `JoinCard` porte déjà la sienne : son repli est vide, parce que la carte
- * disparaît pour un membre.
+ * Les deux cartes du haut lisent Strapi dans une portée `use cache`, qui se résout
+ * au prérendu : ces frontières ne s'affichent normalement jamais. Elles sont le
+ * filet d'une entrée froide, et la garantie que le rail — monté dans le layout —
+ * ne bloque aucune route.
  */
 export const RightRail = ({ className }: { className?: string }) => (
   <aside

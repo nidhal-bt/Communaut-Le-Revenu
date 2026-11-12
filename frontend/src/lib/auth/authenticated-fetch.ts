@@ -13,16 +13,12 @@ import {
 } from "./session";
 
 /**
- * Le seul chemin pour appeler l'API en tant que membre.
+ * Le seul chemin pour appeler l'API en tant que membre, délibérément à côté de
+ * `strapiFetch` et non dedans : ce dernier documente comment mettre ses appelants
+ * en cache, et y glisser une écriture inviterait à poser un POST dans une portée
+ * `use cache`, ce que Next ne peut pas rattraper.
  *
- * Volontairement à côté de `strapiFetch` plutôt que dedans : ce dernier est le
- * client des lectures publiques, et toute sa documentation explique comment
- * mettre ses appelants en cache. Y glisser une écriture inviterait à poser un
- * POST dans une portée `use cache`, ce que Next ne peut pas rattraper. C'est la
- * même raison qui fait que `strapi/auth.ts` lance son `fetch` lui-même.
- *
- * **Jamais dans une portée `use cache` :** `readSession` lit les cookies, donc
- * une API de requête. Aujourd'hui le seul appelant est une Server Action.
+ * **Jamais dans une portée `use cache` :** `readSession` lit les cookies.
  */
 export class NotAuthenticatedError extends Error {
   constructor() {
@@ -56,9 +52,8 @@ const send = async (
     signal: options.signal,
   });
 
-/* Une écriture de cookie pendant un rendu lève, et ce n'est pas un échec : le
-   jeton rafraîchi reste valable pour *cette* requête. La conséquence assumée,
-   déjà notée dans `session.ts` : la requête suivante recommencera. */
+/* Une écriture de cookie pendant un rendu lève, et ce n'est pas un échec : le jeton
+   rafraîchi reste valable pour *cette* requête, la suivante recommencera. */
 const persist = async (session: Session): Promise<void> => {
   try {
     await writeSession(session);
@@ -90,9 +85,8 @@ const renew = async (session: Session): Promise<Session> => {
     throw new NotAuthenticatedError();
   }
 
-  /* La session entière est réécrite : le jeton de rotation que l'on vient
-     d'envoyer est déjà invalide, et n'enregistrer que le `jwt` laisserait une
-     session incapable de se rafraîchir à nouveau. */
+  /* La session entière est réécrite : le jeton que l'on vient d'envoyer est déjà
+     invalide, et n'enregistrer que le `jwt` laisserait une session figée. */
   const next: Session = {
     jwt: rotated.jwt,
     refreshToken: rotated.refreshToken,
@@ -114,10 +108,8 @@ export const authenticatedFetch = async <T>(
 
   let response = await send(path, options, session.jwt);
 
-  /* Le jeton d'accès ne vit que 10 minutes : un 401 est le cas normal, pas une
-     exception. Un 403 est laissé tel quel — il veut dire « pas autorisé », et
-     non « jeton mort ». Le rejeu est une seconde ligne droite plutôt qu'un
-     compteur : un 401 sur celle-ci est terminal. */
+  /* Le jeton d'accès ne vit que 10 minutes : un 401 est le cas normal. Un 403 est
+     laissé tel quel — « pas autorisé », et non « jeton mort ». Un seul rejeu. */
   if (response.status === 401) {
     const renewed = await renew(session);
 

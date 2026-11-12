@@ -13,16 +13,12 @@ import type { Category, DiscussionType } from "@/types/models";
 import { ComposerModal } from "@/components/composer/composer-modal";
 
 /**
- * La barre `.quick` de la maquette : « une seule porte d'entrée pour publier ».
- * Elle reste en haut du fil, visiteur comme membre.
+ * La maquette propose un troisième raccourci, « Sondage », écarté — voir
+ * `@/lib/discussion-types`.
  *
- * La maquette propose trois raccourcis ; le troisième, « Sondage », est écarté
- * — voir `@/lib/discussion-types`.
- *
- * Les deux raccourcis disparaissent sous `md` : c'est le bouton central de la
- * barre basse qui tient ce rôle sur mobile, comme dans la maquette. On garde
- * `md:` (768px) plutôt que son 760px, pour rompre au même point que
- * `bottom-nav.tsx` et `side-nav.tsx`.
+ * Les deux raccourcis disparaissent sous `md` : c'est le bouton central de la barre
+ * basse qui tient ce rôle sur mobile. On garde `md:` (768px) plutôt que son 760px,
+ * pour rompre au même point que `bottom-nav.tsx` et `side-nav.tsx`.
  */
 
 /** Gabarit de la barre, partagé avec le squelette pour qu'ils ne divergent pas. */
@@ -34,9 +30,8 @@ const FOCUS =
   "outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50";
 
 /**
- * Décoratif : l'initiale du membre, ou l'icône grise de la maquette pour un
- * visiteur. Un `Avatar` partagé attendra un troisième appelant — la pastille de
- * `navbar.tsx` ne partage ni la taille, ni le fond, ni le contenu.
+ * Un `Avatar` partagé attendra un troisième appelant : la pastille de `navbar.tsx`
+ * ne partage ni la taille, ni le fond, ni le contenu.
  */
 const Avatar = ({ username }: { username: string | null }) => {
   if (username === null) {
@@ -68,8 +63,7 @@ export const QuickComposer = ({ categories }: { categories: Category[] }) => {
     DEFAULT_DISCUSSION_TYPE,
   );
 
-  /* Un visiteur doit d'abord se connecter : la maquette passe par le même
-     `requireLogin` avant d'ouvrir le composer. */
+  /* Un visiteur doit d'abord se connecter. */
   const openComposer = (type: DiscussionType) => {
     if (!isAuth) {
       setLoginOpen(true);
@@ -130,10 +124,6 @@ export const QuickComposer = ({ categories }: { categories: Category[] }) => {
   );
 };
 
-/**
- * Repli du `<Suspense>` pendant la lecture des espaces : la même coquille, à la
- * même hauteur, pour qu'il n'y ait pas de saut de mise en page.
- */
 export const QuickComposerSkeleton = () => (
   <div aria-hidden className={BAR}>
     <span className="size-10 flex-none rounded-full bg-accent" />

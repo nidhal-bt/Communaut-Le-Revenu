@@ -5,13 +5,7 @@ import { SITE_URL } from "@/components/layout/site-bar";
 import { SpaceTile } from "@/components/space-tile";
 import { fetchCategories } from "@/lib/strapi/categories";
 
-/**
- * Le rail de navigation de la maquette : les pages, puis les espaces.
- *
- * « Classement » et « Charte » n'ont pas encore de route : ce sont des
- * emplacements. Les autres liens pointent sur du réel, et `NavLink` déduit
- * lui-même lequel est sélectionné.
- */
+/** « Classement » et « Charte » n'ont pas encore de route : ce sont des emplacements. */
 const LINKS = [
   { href: "/", label: "Accueil", icon: House },
   { href: "/espaces", label: "Tous les espaces", icon: LayoutGrid },
@@ -19,18 +13,12 @@ const LINKS = [
   { href: "#", label: "Charte", icon: BookOpen },
 ];
 
-/** `.nav-title` de la maquette. */
 const SECTION_TITLE =
   "px-2.5 pt-[18px] pb-1.5 text-[11.5px] font-semibold text-muted-foreground";
 
 /**
- * Un lien par espace.
- *
  * Liste vide — backend éteint — : rien ne s'affiche. Le rail doit survivre à
  * l'absence de Strapi, les liens de navigation au-dessus n'en dépendant pas.
- *
- * Le point rouge des centres d'intérêt de la maquette est écarté : il n'existe
- * aucun modèle d'intérêts.
  */
 const SpacesNav = async () => {
   const categories = await fetchCategories();
@@ -75,13 +63,11 @@ export const SideNav = () => (
     <h2 className={SECTION_TITLE}>Espaces</h2>
 
     {/* La liste est un scope `use cache`, donc pré-rendable : la frontière
-        n'est plus imposée par le build, elle évite seulement que les liens
-        au-dessus attendent Strapi quand le cache est froid. */}
+        évite seulement que les liens au-dessus attendent un cache froid. */}
     <Suspense fallback={<SpacesNavSkeleton />}>
       <SpacesNav />
     </Suspense>
 
-    {/* Pied de rail : le second retour vers le site, comme dans la maquette. */}
     <a
       href={SITE_URL}
       target="_blank"

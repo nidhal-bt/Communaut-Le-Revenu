@@ -4,22 +4,15 @@ import { cn } from "@/lib/utils";
 const PARAGRAPH_BREAK = /\n\s*\n/;
 
 /**
- * Le corps d'une discussion ou d'une réponse.
+ * `content` est une colonne `text` : il n'y a ni blocs ni balisage à interpréter.
+ * Un paragraphe par ligne vide, un `<br />` par retour simple, rien d'autre.
  *
- * `content` est une colonne `text` : il n'y a ni blocs ni balisage à
- * interpréter. On rend donc un paragraphe par ligne vide, un `<br />` par
- * retour simple, et rien d'autre.
- *
- * `formatBody` de la maquette gère aussi `**gras**`, les listes `- `, les
- * mentions `@` et les liens. Aucun n'est repris, et c'est volontaire : rien
- * dans l'application ne peut les produire — le composer n'offre aucun outil de
- * mise en forme, et les 89 contenus de `backend/data/` n'en portent pas un
- * seul. Les rendre ferait disparaître des `**` tapés littéralement, ou
- * réordonnerait les lignes de l'auteur ; une mention demanderait en plus une
- * recherche de pseudo que le backend refuse d'exposer.
+ * `formatBody` de la maquette gère aussi `**gras**`, les listes, les mentions et
+ * les liens. Aucun n'est repris, et c'est volontaire : rien dans l'application ne
+ * peut les produire, et les rendre ferait disparaître des `**` tapés littéralement.
  *
  * Des éléments React, jamais `dangerouslySetInnerHTML` : React échappe par
- * construction, l'`esc()` de la maquette n'a donc pas d'équivalent ici.
+ * construction.
  */
 export const Prose = ({
   text,

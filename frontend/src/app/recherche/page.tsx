@@ -21,7 +21,6 @@ export const metadata: Metadata = {
 /** En dessous de deux caractères, « a » ramènerait la moitié du fil. */
 const MIN_QUERY_LENGTH = 2;
 
-/** Les suggestions de la maquette, pour une recherche encore vide. */
 const SUGGESTIONS = [
   "PEA",
   "assurance-vie",
@@ -31,7 +30,7 @@ const SUGGESTIONS = [
   "frais réels",
 ];
 
-/** La `.chip` de la maquette. Un lien, donc : aucun JavaScript à charger. */
+/** Un lien, et non un bouton : aucun JavaScript à charger. */
 const CHIP =
   "inline-flex items-center rounded-full border bg-card px-[13px] py-1.5 text-[13.5px] font-medium whitespace-nowrap text-foreground-secondary shadow-lift hover:border-border-strong hover:text-foreground";
 
@@ -49,10 +48,7 @@ const Suggestions = () => (
   </div>
 );
 
-/**
- * La lecture elle-même, sous sa propre frontière : le champ est déjà à l'écran
- * et n'a pas à attendre Strapi.
- */
+/** Sous sa propre frontière : le champ est déjà à l'écran et n'attend pas Strapi. */
 const Results = async ({ query, page }: { query: string; page: number }) => {
   const result = await searchDiscussions(query, page);
 
@@ -107,9 +103,8 @@ const Results = async ({ query, page }: { query: string; page: number }) => {
 };
 
 /**
- * `searchParams` est attendu *ici*, pas dans le corps de la page : une lecture
- * de la requête là-haut rendrait la route dynamique en entier et l'en-tête
- * perdrait son pré-rendu. Même découpage que `FeedSection`.
+ * `searchParams` est attendu *ici*, pas dans le corps de la page : une lecture de la
+ * requête là-haut rendrait la route dynamique en entier.
  */
 const SearchSection = async ({
   searchParams,

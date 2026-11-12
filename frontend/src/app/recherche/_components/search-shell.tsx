@@ -1,11 +1,9 @@
 import { Search } from "lucide-react";
 
 /**
- * Les morceaux que la page de recherche partage avec son repli de chargement
- * et avec ses propres frontières `<Suspense>` : sans eux, chaque état
- * redessinerait un en-tête et un champ qui peuvent diverger.
- *
- * Même raison que `SPACES_GRID` dans `espaces/_components/spaces-grid.tsx`.
+ * Les morceaux que la page de recherche partage avec son repli de chargement et ses
+ * frontières : sans eux, chaque état redessinerait un en-tête et un champ qui
+ * peuvent diverger.
  */
 
 export const SearchHeader = () => (
@@ -20,10 +18,7 @@ export const SearchHeader = () => (
   </header>
 );
 
-/**
- * Le champ de la maquette (`#f-search2`) : un `form` nu, dont la soumission
- * native recharge la page avec `q`. Pas de `"use client"`, pas d'état.
- */
+/** Un `form` nu, dont la soumission native recharge la page avec `q` : aucun état. */
 export const SearchField = ({ query }: { query: string }) => (
   <form
     action="/recherche"

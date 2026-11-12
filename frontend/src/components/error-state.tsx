@@ -4,10 +4,7 @@ import { TriangleAlert } from "lucide-react";
 import { StateCard } from "@/components/state-card";
 import { Button } from "@/components/ui/button";
 
-/**
- * L'état d'erreur, avec son bouton de reprise. Deux appelants : la frontière
- * des routes (`app/error.tsx`) et celle du layout (`app/global-error.tsx`).
- */
+/** Deux appelants : `app/error.tsx` et `app/global-error.tsx`. */
 export const ErrorState = ({
   title,
   description,

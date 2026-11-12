@@ -7,13 +7,8 @@ import { cn } from "@/lib/utils";
 import { POST_SHELL } from "./post-shell";
 
 /**
- * La `.reply-login` de la maquette : ce qu'un visiteur voit à la place du
- * formulaire.
- *
- * La modale est montée ici avec son propre état, comme dans `join-card.tsx` et
- * `compose-here-button.tsx`. Et comme `LoginModal` déclare le membre au
- * contexte, le formulaire de réponse prend la place de cette carte sans
- * rechargement.
+ * `LoginModal` déclare le membre au contexte : le formulaire de réponse prend donc
+ * la place de cette carte sans rechargement.
  */
 export const ReplyLoginCard = () => {
   const [loginOpen, setLoginOpen] = useState(false);

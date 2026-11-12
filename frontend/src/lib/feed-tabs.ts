@@ -10,11 +10,8 @@ import {
 import type { StrapiQuery } from "@/types/strapi";
 
 /**
- * Les onglets du fil et leur traduction en requête Strapi.
- *
- * Le module est volontairement sans `"use client"` : la barre d'onglets le lit
- * pour s'afficher, la page le lit pour construire sa requête. Les deux partent
- * donc de la même liste et ne peuvent pas divulguer.
+ * Sans `"use client"` : la barre d'onglets lit ce module pour s'afficher, la page
+ * pour construire sa requête. Les deux partent donc de la même liste.
  */
 
 export type FeedTabKey =
@@ -27,7 +24,6 @@ export type FeedTab = {
   key: FeedTabKey;
   label: string;
   icon: LucideIcon;
-  /** « Pour vous » suit les centres d'intérêt du membre : rien à montrer à un visiteur. */
   memberOnly: boolean;
 };
 
@@ -70,21 +66,16 @@ export const FEED_VIEWS: readonly FeedViewOption[] = [
 export const DEFAULT_FEED_VIEW: FeedView = "comfy";
 
 /**
- * Traduit un onglet en fragment de requête, fusionné par `fetchDiscussions`.
- *
- * `userId` n'est lu que par « Pour vous » : les trois autres onglets restent
- * identiques pour un visiteur et pour un membre. Un visiteur n'atteint jamais
- * « Pour vous » — `FeedSection` le redirige avant d'appeler ici —, donc la
- * branche sans `userId` ne sert que de filet : mieux vaut le tri par défaut
- * qu'un filtre sur un identifiant absent.
+ * `userId` n'est lu que par « Pour vous ». Un visiteur n'y arrive jamais —
+ * `FeedSection` le redirige avant —, donc la branche sans `userId` n'est qu'un
+ * filet : mieux vaut le tri par défaut qu'un filtre sur un identifiant absent.
  */
 const sortAndFiltersForTab = (
   tab: FeedTabKey,
   userId?: number,
 ): Pick<StrapiQuery, "sort" | "filters"> => {
   switch (tab) {
-    /* Les fils où le membre est déjà intervenu. Une seule requête : Strapi
-       traverse la relation `replies` puis son auteur. */
+    /* Une seule requête : Strapi traverse la relation `replies` puis son auteur. */
     case "pour-vous":
       return userId
         ? {
@@ -93,17 +84,16 @@ const sortAndFiltersForTab = (
           }
         : { sort: ["createdAt:desc"] };
 
-    /* `createdAt` départage : beaucoup de discussions ont zéro ou une réponse,
-       et Postgres ne garantit aucun ordre entre ex æquo. */
+    /* Postgres ne garantit aucun ordre entre ex aequo, et beaucoup de
+       discussions ont zéro ou une réponse. */
     case "tendances":
       return { sort: ["replyCount:desc", "createdAt:desc"] };
 
     case "recentes":
       return { sort: ["createdAt:desc"] };
 
-    /* `replyCount` est à `null` tant qu'aucune réponse n'a été écrite — le
-       compteur n'est posé qu'au premier incrément. `$eq: 0` seul raterait ces
-       discussions-là, qui sont précisément les plus anciennes sans réponse. */
+    /* `replyCount` est à `null` tant qu'aucune réponse n'a été écrite : `$eq: 0`
+       seul raterait les discussions les plus anciennes sans réponse. */
     case "sans-reponse":
       return {
         sort: ["createdAt:desc"],
@@ -113,10 +103,8 @@ const sortAndFiltersForTab = (
 };
 
 /**
- * Le fragment de requête d'un onglet, restreint à un espace quand il y en a un.
- *
- * Le filtre d'espace se *fusionne* avec celui de l'onglet, il ne le remplace
- * pas : « Sans réponse » occupe déjà `filters`, et l'écraser rendrait l'onglet
+ * Le filtre d'espace se *fusionne* avec celui de l'onglet, il ne le remplace pas :
+ * « Sans réponse » occupe déjà `filters`, et l'écraser rendrait l'onglet
  * silencieusement inopérant dans un espace.
  */
 export const queryForFeedTab = (

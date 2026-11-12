@@ -16,22 +16,10 @@ import {
 import type { Reply } from "@/types/models";
 import type { StrapiSingle } from "@/types/strapi";
 
-/**
- * Publier une réponse.
- *
- * Dans son propre module `"use server"`, et non dans `auth/actions.ts` : chaque
- * export d'un tel module est une route HTTP publique, et garder la surface de
- * l'authentification séparée de celle du contenu rend le rayon d'action de
- * chacune lisible.
- */
 
 export type CreateReplyResult = { reply: Reply } | { error: string };
 
-/**
- * Les erreurs de champ du contrôleur arrivent déjà en français
- * (`backend/src/api/reply/controllers/reply.ts`) : on les relaie plutôt que
- * d'en réécrire d'autres.
- */
+/** Les erreurs de champ du contrôleur arrivent déjà en français : on les relaie. */
 const fieldError = (details: unknown): string | null => {
   const errors = (details as { errors?: Record<string, unknown> } | null)
     ?.errors;
@@ -44,9 +32,9 @@ const fieldError = (details: unknown): string | null => {
 };
 
 /**
- * Le 401 et le 403 ne sont pas relayés : la couche de permissions répond avant
- * le contrôleur, et en anglais. Un visiteur anonyme reçoit un 403 — la
- * politique `global::is-authenticated` refuse — et un jeton mort un 401.
+ * 401 et 403 ne sont pas relayés : les permissions répondent avant le contrôleur,
+ * et en anglais. Un visiteur anonyme reçoit un 403 — `global::is-authenticated`
+ * refuse — et un jeton mort un 401.
  */
 const messageFor = (error: unknown): string => {
   if (error instanceof NotAuthenticatedError) {
@@ -80,8 +68,7 @@ export const createReplyAction = async (
   const content = String(formData.get("content") ?? "").trim();
   const discussion = String(formData.get("discussion") ?? "");
 
-  /* Le textarea porte déjà `required`, mais une action est une route
-     publique : elle revalide ce qu'elle reçoit. */
+  /* Une action est une route publique : elle revalide ce qu'elle reçoit. */
   if (content === "") return { error: "La réponse ne peut pas être vide." };
   if (discussion === "") return { error: "La discussion est introuvable." };
 
@@ -91,29 +78,25 @@ export const createReplyAction = async (
       body: { data: { content, discussion } },
     });
 
-    /* `updateTag` et non `revalidateTag` : c'est l'API « lire ce que l'on vient
-       d'écrire », réservée aux Server Actions, qui périme sans fenêtre de
-       péremption. Toutes ces surfaces bougent par la même publication — le
-       cycle de vie de `reply` vient d'incrémenter `replyCount` en SQL, que le
-       fil de l'accueil et celui de l'espace affichent tous deux. */
+    /* `updateTag` et non `revalidateTag` : l'API « lire ce que l'on vient
+       d'écrire », réservée aux Server Actions, qui périme sans fenêtre. Toutes ces
+       surfaces bougent ensemble — le cycle de vie de `reply` vient d'incrémenter
+       `replyCount` en SQL. */
     updateTag(discussionTag(discussion));
     updateTag(repliesTag(discussion));
     updateTag(HOME_FEED_TAG);
 
-    /* Le contrôleur peuple `discussion.category` pour cette seule ligne. Sans
-       lui — un backend pas redémarré — l'espace se répare de lui-même en une
-       minute plutôt que de faire échouer la publication. */
+    /* Le contrôleur peuple `discussion.category` pour cette seule ligne. Sans lui,
+       l'espace se répare en une minute plutôt que de faire échouer la publication. */
     const slug = data.discussion?.category?.slug;
     if (slug) updateTag(categoryTag(slug));
 
-    /* La réponse vient de changer un classement du rail droit : celui du type
-       de sa discussion parente, et lui seul. Peuplé et donc protégé comme le
-       slug juste au-dessus. */
+    /* La réponse ne change que le classement du type de sa discussion parente. */
     const parentType = data.discussion?.type;
     if (parentType) updateTag(topOfWeekTag(parentType));
 
-    /* Puis le routeur client, que `updateTag` ne touche pas : sans lui, il
-       rejouerait la charge qu'il détient déjà. */
+    /* Le routeur client, que `updateTag` ne touche pas : sans lui, il rejouerait
+       la charge qu'il détient déjà. */
     refresh();
 
     return { reply: data };

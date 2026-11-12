@@ -3,11 +3,8 @@ import { formatRelativeTime } from "@/lib/relative-time";
 import type { PublicAuthor } from "@/types/models";
 
 /**
- * La `.author` de la maquette : monogramme, pseudo, ancienneté.
- *
- * Les `roleTags`, les points et les badges ne sont pas repris — `author` ne
- * porte que `documentId` et `username`. Le compteur de vues que la maquette
- * place dans `.author-sub` n'existe pas non plus côté backend.
+ * Les `roleTags`, les points, les badges et le compteur de vues de la maquette ne
+ * sont pas repris : aucun n'existe côté backend.
  */
 export const AuthorByline = ({
   author,

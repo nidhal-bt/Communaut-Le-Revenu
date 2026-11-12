@@ -5,20 +5,12 @@ import { toStrapiError } from "./client";
 import { STRAPI_API_URL } from "./config";
 
 /**
- * Les trois appels d'authentification : la connexion, la rotation du jeton et
- * la déconnexion.
- *
- * Il ne passe pas par `strapiFetch` pour deux raisons : c'est un POST sans
- * paramètres de requête, et surtout il faut lire les en-têtes de la réponse,
- * que `strapiFetch` ne rend pas. Le backend tourne en `jwtManagement:
- * 'refresh'` avec `sessions.httpOnly`, donc le corps ne contient que
- * `{ jwt, user }` : le jeton de rotation n'arrive que par `Set-Cookie`.
- *
- * Appelé uniquement depuis une Server Action : le mot de passe ne traverse
- * jamais le navigateur vers Strapi, et l'origine du backend reste privée.
+ * Ces trois appels ne passent pas par `strapiFetch` : il faut lire les en-têtes
+ * de la réponse, que `strapiFetch` ne rend pas. Le backend tourne en
+ * `jwtManagement: 'refresh'` avec `sessions.httpOnly`, donc le corps ne contient
+ * que `{ jwt, user }` — le jeton de rotation n'arrive que par `Set-Cookie`.
  */
 
-/** Nom du cookie posé par Strapi (`sessions.cookie.name`, non surchargé). */
 const REFRESH_COOKIE = "strapi_up_refresh";
 
 export type LoginResponse = {
@@ -28,10 +20,8 @@ export type LoginResponse = {
 };
 
 /**
- * Récupère la valeur du cookie de rotation dans les en-têtes `Set-Cookie`.
- *
- * Strapi en pose deux — la valeur et sa signature Koa `strapi_up_refresh.sig`
- * — d'où la comparaison exacte sur le nom. `getSetCookie()` est indispensable :
+ * Strapi pose deux cookies — la valeur et sa signature Koa `.sig` — d'où la
+ * comparaison exacte sur le nom. `getSetCookie()` est indispensable :
  * `get("set-cookie")` concatène les deux en une seule chaîne.
  */
 const readRefreshToken = (response: Response): string | null => {
@@ -67,9 +57,8 @@ export const login = async (
 
   const { jwt, user } = (await response.json()) as { jwt: string; user: User };
 
-  /* On ne garde que les champs utiles à l'interface : la réponse porte aussi
-     `provider`, `confirmed`, `blocked` et les dates, qui n'ont rien à faire
-     dans un cookie envoyé à chaque requête. */
+  /* La réponse porte aussi `provider`, `confirmed`, `blocked` et les dates, qui
+     n'ont rien à faire dans un cookie envoyé à chaque requête. */
   return {
     jwt,
     refreshToken: readRefreshToken(response),
@@ -89,18 +78,13 @@ export type RefreshResponse = {
 };
 
 /**
- * `POST /api/auth/refresh` — échange le jeton de rotation contre un jeton
- * d'accès neuf.
+ * Le jeton part dans le **corps**, pas dans un en-tête `Cookie` : le plugin lit
+ * d'abord son cookie puis retombe sur `body.refreshToken`, et depuis Node il
+ * n'existe aucun bocal à cookies.
  *
- * Le jeton part dans le **corps** de la requête, pas dans un en-tête `Cookie`.
- * Le plugin lit d'abord son cookie puis retombe sur `body.refreshToken`
- * (`controllers/auth.js`), et depuis Node il n'existe aucun bocal à cookies :
- * forger l'en-tête serait du travail pour rien.
- *
- * On renvoie le jeton de rotation **tel qu'il est revenu**, `null` compris, et
- * jamais celui qui vient d'être envoyé : la rotation l'invalide sur-le-champ,
- * donc le conserver laisserait une session d'apparence saine mais incapable de
- * se rafraîchir une seconde fois.
+ * Le jeton de rotation est renvoyé **tel qu'il est revenu**, `null` compris, et
+ * jamais celui qui vient d'être envoyé : la rotation l'invalide sur-le-champ, donc
+ * le conserver laisserait une session incapable de se rafraîchir une seconde fois.
  */
 export const refresh = async (
   refreshToken: string,
@@ -124,17 +108,11 @@ export const refresh = async (
 };
 
 /**
- * `POST /api/auth/logout` — révoque la session côté Strapi.
+ * Le jeton de rotation, dans le corps, désigne *laquelle* des sessions du membre
+ * tombe — depuis Node il n'y a pas de cookie pour le porter.
  *
- * Le jeton d'accès autorise l'appel, et le jeton de rotation, dans le corps,
- * désigne *laquelle* des sessions du membre tombe. Le plugin lit d'abord son
- * propre cookie, retombe sur `body.refreshToken`, et seulement ensuite sur la
- * session portée par le jeton d'accès (`controllers/auth.js`) : depuis Node il
- * n'y a pas de cookie, on l'envoie donc explicitement plutôt que de s'en
- * remettre au dernier recours.
- *
- * La route n'existe que sous `jwtManagement: 'refresh'`, le mode configuré
- * dans `backend/config/plugins.ts` — ailleurs le contrôleur répond 404.
+ * La route n'existe que sous `jwtManagement: 'refresh'`, le mode configuré dans
+ * `backend/config/plugins.ts` — ailleurs le contrôleur répond 404.
  */
 export const logout = async (
   jwt: string,

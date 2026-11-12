@@ -1,11 +1,8 @@
 /**
- * Enveloppes de l'API REST Strapi 5.
- *
  * Strapi 5 renvoie les champs à plat, à côté de `documentId` : il n'y a pas de
- * niveau `attributes` à modéliser. Voir `backend/CLAUDE.md`.
+ * niveau `attributes` à modéliser.
  */
 
-/** Champs système présents sur chaque document renvoyé par l'API. */
 export type StrapiDocument = {
   /** Identifiant numérique interne. Ne pas l'utiliser pour router ni pour référencer. */
   id: number;
@@ -13,10 +10,7 @@ export type StrapiDocument = {
   documentId: string;
   createdAt: string;
   updatedAt: string;
-  /**
-   * `draftAndPublish` est désactivé sur les trois types de contenu : ce champ
-   * est toujours présent mais ne signale aucun cycle de publication.
-   */
+  /** `draftAndPublish` est désactivé : toujours présent, ne signale aucun cycle. */
   publishedAt: string;
 };
 
@@ -39,10 +33,7 @@ export type StrapiSingle<T> = {
   meta: Record<string, never>;
 };
 
-/**
- * Corps renvoyé sur une erreur. Strapi n'utilise jamais une enveloppe
- * `{ success, data, message }`.
- */
+/** Strapi n'utilise jamais une enveloppe `{ success, data, message }`. */
 export type StrapiErrorBody = {
   data: null;
   error: {
@@ -54,15 +45,11 @@ export type StrapiErrorBody = {
 };
 
 /**
- * Paramètres de requête, sérialisés par `buildQueryString`.
- *
  * Le backend active `strictParams` : une clé inconnue ou une syntaxe invalide
- * renvoie un 400 au lieu d'être ignorée. `locale` et `status` n'existent pas
- * ici (ni i18n, ni draft & publish) et déclencheraient donc une erreur.
+ * renvoie un 400 au lieu d'être ignorée. `locale` et `status` n'existent pas ici.
  */
 export type StrapiQuery = {
   fields?: string[];
-  /** Les relations ne sont jamais peuplées par défaut : sans `populate`, elles sont absentes. */
   populate?: string[] | Record<string, unknown>;
   sort?: string[];
   filters?: Record<string, unknown>;

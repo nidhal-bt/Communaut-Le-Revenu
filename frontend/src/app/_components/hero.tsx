@@ -6,14 +6,12 @@ import { LoginModal } from "@/components/auth/login-modal";
 import { useAuth } from "@/lib/auth/auth-context";
 
 /**
- * Bloc d'accueil réservé aux visiteurs. Dès que le lecteur est connecté, la
- * maquette remplace ce hero par un simple « Bonjour {prénom} » — pas encore
- * implémenté, la section disparaît donc sans rien afficher à la place.
+ * Réservé aux visiteurs : connecté, la maquette remplace le hero par un « Bonjour
+ * {prénom} » pas encore implémenté, la section disparaît donc.
  *
- * Les compteurs sont ceux de la maquette, en attendant que Strapi serve les
- * totaux réels. Les nombres utilisent une espace fine insécable (U+202F) :
- * c'est la convention française et cela évite qu'un nombre soit coupé en fin
- * de ligne.
+ * Compteurs de la maquette, en attendant que Strapi serve les totaux réels. Les
+ * nombres portent une espace fine insécable (U+202F) : convention française, et
+ * cela évite qu'un nombre soit coupé en fin de ligne.
  */
 const STATS = [
   { value: "4 812", label: "membres" },
@@ -61,8 +59,7 @@ const HeroBody = () => {
           >
             Rejoindre gratuitement
           </Button>
-          {/* « Explorer les espaces » reste présentationnel : la page des
-              espaces n'existe pas encore. */}
+          {/* « Explorer les espaces » reste présentationnel : aucun `href`. */}
           <Button
             variant="ghost"
             size="lg"
@@ -79,9 +76,8 @@ const HeroBody = () => {
 };
 
 /**
- * `useAuth` suspend le temps de lire le cookie de session, et le hero n'existe
- * que pour un visiteur : un repli vide est donc exactement ce qu'un membre
- * verra de toute façon, et le visiteur n'attend que la lecture d'un cookie.
+ * Le hero n'existe que pour un visiteur : un repli vide est exactement ce qu'un
+ * membre verra de toute façon.
  */
 export const Hero = () => (
   <Suspense fallback={null}>

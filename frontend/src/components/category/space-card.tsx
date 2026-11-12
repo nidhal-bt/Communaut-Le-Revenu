@@ -7,7 +7,6 @@ import {
 import { SpaceTile } from "@/components/space-tile";
 import type { Category } from "@/types/models";
 
-/** La `.space` de la maquette : une carte par espace dans la grille. */
 export const SpaceCard = ({ category }: { category: Category }) => (
   <Link
     href={`/espaces/${category.slug}`}

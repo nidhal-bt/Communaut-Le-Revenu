@@ -7,15 +7,10 @@ import { POST_SHELL } from "./post-shell";
 import { Prose } from "./prose";
 
 /**
- * La `.post-main` de la maquette : les méta, le titre, l'auteur, le corps.
- *
  * Écarté faute de champ côté backend : les vues, les « utiles », « Suivre »,
- * « Épinglé », la meilleure réponse, les rôles et les points de l'auteur, le
- * bloc « Lier un article du Revenu » et les sondages. Toute la rangée
- * `.actions` est donc absente plutôt que rendue inerte — un bouton qui ne fait
- * rien est une régression d'accessibilité. « Copier le lien » est la seule
- * action qui se passerait du backend, mais elle demanderait un composant client
- * et un `<Toaster />` monté dans le layout.
+ * « Épinglé », la meilleure réponse, les rôles et points de l'auteur, les sondages.
+ * Toute la rangée `.actions` est absente plutôt que rendue inerte — un bouton qui
+ * ne fait rien est une régression d'accessibilité.
  */
 export const DiscussionPost = ({ discussion }: { discussion: Discussion }) => (
   <article className={POST_SHELL}>

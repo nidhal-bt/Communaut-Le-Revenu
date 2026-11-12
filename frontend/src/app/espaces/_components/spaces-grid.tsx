@@ -1,9 +1,6 @@
 /**
- * Les morceaux que la page des espaces et son repli de chargement partagent :
- * sans eux, `loading.tsx` redessinerait une grille et un en-tête qui peuvent
- * diverger de la page.
- *
- * Même raison que `FEED_SHELL`, exporté par `feed-list.tsx` pour son squelette.
+ * Les morceaux que la page des espaces et son repli de chargement partagent : sans
+ * eux, `loading.tsx` redessinerait une grille qui peut diverger de la page.
  */
 export const SPACES_GRID =
   "grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-3.5";

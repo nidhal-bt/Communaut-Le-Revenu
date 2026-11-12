@@ -16,9 +16,8 @@ const COUNT =
   "flex-none text-[13px] font-semibold tabular-nums text-foreground-secondary";
 
 /**
- * « Tout voir » renvoie au fil trié par activité — l'onglet nommé plutôt que
- * l'adresse nue, pour que le lien garde son sens si l'onglet par défaut change.
- * La maquette pointait vers un classement de membres, qui n'existe pas ici.
+ * L'onglet est nommé plutôt que l'adresse nue, pour que le lien garde son sens si
+ * l'onglet par défaut change.
  */
 const SeeAll = (
   <Link
@@ -30,15 +29,9 @@ const SeeAll = (
 );
 
 /**
- * Bloc « discussions les plus actives » : les cinq discussions les plus
- * commentées des sept derniers jours.
- *
- * Même lecture que la carte au-dessus, à deux arguments près — le type et la
- * limite — donc une entrée de cache et une étiquette distinctes. Les questions
- * en sont exclues : elles ont leur propre carte.
- *
- * La maquette classait des membres à leurs points (`topWidget`), notion absente
- * du backend ; seule la géométrie des rangées est reprise.
+ * Les questions sont exclues : elles ont leur propre carte, donc une entrée de
+ * cache et une étiquette distinctes. La maquette classait des membres à leurs
+ * points, notion absente du backend — seule la géométrie des rangées est reprise.
  */
 export const TopDiscussionsCard = async () => {
   const result = await fetchTopOfWeek("discussion", LIMIT);
@@ -70,9 +63,8 @@ export const TopDiscussionsCard = async () => {
             href={discussionHref(discussion)}
             className={cn(ROW, "group")}
           >
-            {/* Le podium en rouge, comme la maquette. Le compteur reste neutre :
-                le rouge sur un nombre de réponses veut déjà dire « sans
-                réponse » dans ce code (`discussion-row.tsx`). */}
+            {/* Le compteur reste neutre : le rouge sur un nombre de réponses
+                veut déjà dire « sans réponse » (`discussion-row.tsx`). */}
             <span
               className={cn(
                 RANK,
@@ -94,10 +86,7 @@ export const TopDiscussionsCard = async () => {
   );
 };
 
-/**
- * Le repli de la carte : cinq rangées grises dans la géométrie des vraies. Les
- * largeurs varient pour donner l'allure de titres plutôt que d'un gabarit.
- */
+/** Les largeurs varient pour donner l'allure de titres plutôt que d'un gabarit. */
 const TITLE_WIDTHS = ["w-full", "w-11/12", "w-full", "w-10/12", "w-8/12"];
 
 export const TopDiscussionsCardSkeleton = () => (

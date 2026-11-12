@@ -56,12 +56,8 @@ const Byline = ({
 };
 
 /**
- * La `.tcard` de la maquette : le compteur de réponses en pastille, puis les
- * méta, le titre et le chapô.
- *
- * La maquette montre aussi les « utiles », les vues et les avatars des
- * répondants : aucun de ces champs n'existe côté backend, ils sont donc
- * simplement absents plutôt qu'inventés.
+ * La maquette montre aussi les « utiles », les vues et les avatars des répondants :
+ * aucun de ces champs n'existe côté backend, ils sont donc absents plutôt qu'inventés.
  */
 export const DiscussionCard = ({ discussion }: { discussion: Discussion }) => {
   const { title, content, type, category, author, createdAt } = discussion;

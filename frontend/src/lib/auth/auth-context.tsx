@@ -4,25 +4,20 @@ import { createContext, use, useContext, useState } from "react";
 import type { User } from "@/types/models";
 
 /**
- * Qui est connecté, pour les composants client.
- *
  * La session vit dans un cookie `httpOnly` : seul le serveur sait la lire. Le
- * layout crée donc la promesse (`getSessionUser()`) et la passe telle quelle,
- * sans l'attendre — un `await` dans le layout retiendrait toute l'application
- * derrière la requête. `useAuth` la dénoue avec `use()`, ce qui suspend
- * l'appelant : **tout composant qui appelle `useAuth` doit vivre sous une
- * frontière `<Suspense>`**, sinon c'est la page entière qui attend.
+ * layout crée donc la promesse et la passe sans l'attendre — un `await` là-bas
+ * retiendrait toute l'application derrière la requête.
  *
- * C'est le motif décrit par
- * `node_modules/next/dist/docs/01-app/02-guides/authentication-with-cache-components.md`.
+ * `useAuth` la dénoue avec `use()`, ce qui suspend l'appelant : **tout composant
+ * qui appelle `useAuth` doit vivre sous une frontière `<Suspense>`**, sinon c'est
+ * la page entière qui attend. `useSetUser` existe pour ne pas imposer cela aux
+ * composants qui écrivent la session sans la lire.
  */
 type AuthContextValue = {
-  /** Résolue par le serveur à chaque requête, à partir du cookie de session. */
   sessionUser: Promise<User | null>;
   /**
-   * Ce que le client sait de plus que le serveur. `undefined` signifie « rien
-   * à signaler, garde la session du serveur » — à distinguer de `null`, qui
-   * veut dire « visiteur ».
+   * Ce que le client sait de plus que le serveur. `undefined` signifie « rien à
+   * signaler, garde la session du serveur », à distinguer de `null` : « visiteur ».
    */
   override: User | null | undefined;
   setUser: (user: User | null) => void;
@@ -64,9 +59,5 @@ export const useAuth = () => {
   return { user, isAuth: user !== null };
 };
 
-/**
- * Déclarer la session sans la lire, donc sans suspendre. C'est ce dont la
- * modale de connexion a besoin : `loginAction` vient de poser le cookie côté
- * serveur et renvoie le membre, l'interface doit basculer sans recharger.
- */
+/** Déclarer la session sans la lire, donc sans suspendre : ce dont la modale a besoin. */
 export const useSetUser = () => useAuthContext().setUser;

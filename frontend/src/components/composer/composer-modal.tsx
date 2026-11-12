@@ -20,16 +20,12 @@ import { cn } from "@/lib/utils";
 import type { Category, DiscussionType } from "@/types/models";
 
 /**
- * « Nouvelle publication » : la modale du composer de la maquette
- * (`openComposer()`), réduite à ce que le backend sait recevoir.
- *
- * Écarté faute de support : la recherche de discussions similaires, l'outil de
- * mention, les réponses de sondage, le bloc « Lier un article du Revenu » et
+ * Écarté faute de support backend : la recherche de discussions similaires, l'outil
+ * de mention, les réponses de sondage, le bloc « Lier un article du Revenu » et
  * l'enregistrement automatique du brouillon.
  *
- * Les champs ne sont pas contrôlés, comme dans `login-modal.tsx` : l'action lit
- * le `FormData`. Le type, lui, vient de la barre, qui sait lequel a été cliqué,
- * et c'est lui qui décide du titre d'exemple.
+ * Les champs ne sont pas contrôlés, comme dans `login-modal.tsx` : l'action lit le
+ * `FormData`. Le type vient de la barre, qui sait lequel a été cliqué.
  */
 
 type ComposerModalProps = {
@@ -77,18 +73,15 @@ export const ComposerModal = ({
       onOpenChange(false);
       toast.success("Votre publication est en ligne.");
 
-      /* Puis la discussion qui vient de naître : fermer sur place laisserait le
-         membre chercher sa publication dans le fil. Le contrôleur renvoie le
-         document créé, `discussionHref` a donc son titre et son `documentId`
-         sans seconde lecture. Fermée avant d'être poussée, la modale disparaît
-         proprement au lieu d'être démontée par la navigation. */
+      /* Fermée avant d'être poussée, la modale disparaît proprement au lieu
+         d'être démontée par la navigation. Le contrôleur renvoie le document
+         créé, `discussionHref` a donc tout sans seconde lecture. */
       router.push(discussionHref(result.discussion));
     });
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      {/* Largeur de la maquette : min(640px, 100%) dans une gouttière de 16px. */}
       <DialogContent
         showCloseButton={false}
         className="max-h-[calc(100dvh-32px)] max-w-[min(640px,calc(100%-2rem))] gap-0 overflow-auto p-0 sm:max-w-[min(640px,calc(100%-2rem))]"
@@ -113,10 +106,10 @@ export const ComposerModal = ({
 
         <form onSubmit={handleSubmit}>
           <div className="flex flex-col gap-4 px-[22px] pt-4 pb-[22px]">
-            {/* Des radios natives : le groupement par `name` et la navigation aux
+            {/* Des radios natives : groupement par `name` et navigation aux
                 flèches viennent du navigateur. Elles restent focusables — d'où
-                `opacity-0` plutôt que `hidden` — pour que `:has()` puisse porter
-                l'anneau de focus sur la carte. */}
+                `opacity-0` plutôt que `hidden` — pour que `:has()` porte l'anneau
+                de focus sur la carte. */}
             <div
               role="radiogroup"
               aria-label="Type de publication"
@@ -195,8 +188,7 @@ export const ComposerModal = ({
                   </option>
                 ))}
               </select>
-              {/* Le backend peut être éteint : on le dit, plutôt que de laisser
-                  un select vide et inexpliqué. */}
+              {/* Le backend peut être éteint : on le dit, plutôt qu'un select vide. */}
               {!hasCategories && (
                 <span className="text-[12.5px] text-muted-foreground">
                   Les espaces ne sont pas disponibles pour le moment.
@@ -212,8 +204,7 @@ export const ComposerModal = ({
                 Détails
               </label>
               {/* Obligatoire, et non « facultatif » comme l'annonçait la
-                  maquette : le contrôleur refuse un contenu vide
-                  (`backend/src/api/discussion/controllers/discussion.ts`). */}
+                  maquette : le contrôleur refuse un contenu vide. */}
               <textarea
                 id="composer-content"
                 name="content"
@@ -224,8 +215,7 @@ export const ComposerModal = ({
               />
             </div>
 
-            {/* « Lire la charte » reste du texte : la charte n'a pas de route,
-                et un lien vers nulle part est une régression d'accessibilité. */}
+            {/* « Lire la charte » reste du texte : la charte n'a pas de route. */}
             <p className="flex items-start gap-2.5 rounded-sm bg-muted px-3 py-2.5 text-[13px] text-foreground-secondary">
               <Shield className="mt-px size-4 flex-none text-muted-foreground" />
               <span>

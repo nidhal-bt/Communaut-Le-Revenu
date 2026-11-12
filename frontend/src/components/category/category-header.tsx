@@ -15,9 +15,8 @@ import { fetchCategories } from "@/lib/strapi/categories";
 import type { Category } from "@/types/models";
 
 /**
- * La liste complète des espaces, pour le select du composer. Lecture mise en
- * cache et sans argument : elle partage son entrée avec le rail gauche, qui l'a
- * déjà demandée.
+ * Lecture mise en cache et sans argument : elle partage son entrée avec le rail
+ * gauche, qui l'a déjà demandée.
  */
 const ComposeHere = async ({ category }: { category: Category }) => {
   const categories = await fetchCategories();
@@ -33,11 +32,8 @@ const ComposeHere = async ({ category }: { category: Category }) => {
 };
 
 /**
- * La `.cat-head` de la maquette : l'identité de l'espace, ses décomptes, le
- * renvoi vers la rubrique du site et le bouton de publication.
- *
- * Décomptes et bouton vivent chacun sous leur frontière : ils demandent l'un
- * deux lectures de totaux, l'autre le cookie de session, et ni le titre ni la
+ * Décomptes et bouton vivent chacun sous leur frontière : ils demandent l'un deux
+ * lectures de totaux, l'autre le cookie de session, et ni le titre ni la
  * description n'ont à les attendre.
  */
 export const CategoryHeader = ({ category }: { category: Category }) => {
@@ -64,7 +60,6 @@ export const CategoryHeader = ({ category }: { category: Category }) => {
           </Suspense>
         </div>
 
-        {/* Comme dans la maquette, tous ces liens mènent à l'accueil du site. */}
         {rubrique && (
           <a
             href={SITE_URL}
@@ -85,7 +80,6 @@ export const CategoryHeader = ({ category }: { category: Category }) => {
   );
 };
 
-/** Repli pendant la lecture de l'espace : mêmes blocs, mêmes hauteurs. */
 export const CategoryHeaderSkeleton = () => (
   <section
     aria-hidden

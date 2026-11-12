@@ -13,23 +13,18 @@ type FeedSectionProps = {
 };
 
 /**
- * Résout l'onglet et le numéro de page, puis charge cette page.
+ * `searchParams` est attendu *ici*, pas dans `page.tsx` : une lecture de la requête
+ * dans le corps de la page la rendrait dynamique en entier, et le hero comme la
+ * barre de publication perdraient leur pré-rendu.
  *
- * `searchParams` est attendu *ici*, pas dans `page.tsx` : une lecture de la
- * requête dans le corps de la page la rendrait dynamique en entier, et le hero
- * comme la barre de publication perdraient leur pré-rendu.
+ * La session n'est lue que pour l'onglet membre : `fetchDiscussions` est un scope
+ * `use cache` dont les arguments forment la clé, et passer l'identifiant sur les
+ * onglets publics découperait leur entrée partagée en une entrée par membre.
  *
- * La session n'est lue que pour l'onglet membre. `fetchDiscussions` est un
- * scope `use cache` dont ses arguments forment la clé : passer l'identifiant
- * sur les onglets publics découperait leur unique entrée partagée en une entrée
- * par membre, pour une requête identique.
- *
- * Un visiteur sur l'onglet membre est redirigé, et non replié en silence sur le
- * tri par défaut : sans ce garde-fou il recevrait le fil « Récentes » complet
- * sous une URL qui annonce « Pour vous », et aucun onglet du rail ne
- * ressortirait comme sélectionné. `pathname` arrive en prop faute de pouvoir se
- * lire côté serveur, et c'est aussi ce qui permet de servir un espace : la
- * redirection doit y revenir, pas retomber sur l'accueil.
+ * Un visiteur sur l'onglet membre est redirigé, et non replié en silence : sinon il
+ * recevrait le fil « Récentes » sous une URL qui annonce « Pour vous ». `pathname`
+ * arrive en prop faute de pouvoir se lire côté serveur, et c'est ce qui permet à la
+ * redirection de revenir dans un espace plutôt que sur l'accueil.
  */
 export const FeedSection = async ({
   pathname,
@@ -51,10 +46,8 @@ export const FeedSection = async ({
   );
 
   /* Une page au-delà de la dernière est ramenée sur la dernière, et non laissée
-     afficher « Rien ici pour l'instant » au milieu d'un fil pourtant plein.
-     `pageCount` à zéro est le fil vide ou le backend éteint : il n'y a alors
-     aucune page où renvoyer. L'onglet et la page sont les deux seuls
-     paramètres du fil, les reposer suffit donc à reconstruire l'adresse. */
+     afficher « Rien ici pour l'instant » au milieu d'un fil plein. `pageCount` à
+     zéro est le fil vide ou le backend éteint : aucune page où renvoyer. */
   if (pageCount > 0 && feedPage > pageCount) {
     redirect(
       feedHref(pathname, new URLSearchParams(), {

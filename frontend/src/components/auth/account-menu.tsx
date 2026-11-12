@@ -11,27 +11,21 @@ import type { User } from "@/types/models";
 const initial = (username: string) => username.trim().charAt(0).toUpperCase();
 
 /**
- * La pastille de compte de l'en-tête, et son menu : un seul article, « Se
- * déconnecter ».
+ * Un seul article : le `meMenu()` de la maquette en porte six autres qui n'ont
+ * aucun écran derrière eux, et un article qui ne mène nulle part est une régression
+ * d'accessibilité.
  *
- * Le `meMenu()` de la maquette en porte six autres — profil, badges, photo,
- * classement… — qui n'ont aucun écran derrière eux pour l'instant. Un article
- * qui ne mène nulle part est une régression d'accessibilité, comme l'était
- * « Lire la charte » dans le composer : ils attendront leurs pages.
- *
- * `Menu` de Base UI, déjà la dépendance de `ui/dialog.tsx`, plutôt qu'un
- * `useState` et un écouteur de clic au document : la fermeture sur `Échap` et
- * au clic dehors, le focus rendu au déclencheur et la navigation aux flèches
- * viennent avec.
+ * `Menu` de Base UI, déjà la dépendance de `ui/dialog.tsx`, plutôt qu'un `useState`
+ * et un écouteur de clic : la fermeture sur `Échap` et au clic dehors, le focus
+ * rendu au déclencheur et la navigation aux flèches viennent avec.
  */
 export const AccountMenu = ({ user }: { user: User }) => {
   const setUser = useSetUser();
   const router = useRouter();
   const [pending, startTransition] = useTransition();
 
-  /* L'action a vidé le cookie côté serveur ; le dire au contexte fait
-     rebasculer l'en-tête et le fil en visiteur sans recharger, et `refresh()`
-     redemande au serveur ce qui dépendait de la session. */
+  /* Le dire au contexte fait rebasculer l'en-tête et le fil en visiteur sans
+     recharger ; `refresh()` redemande au serveur ce qui dépendait de la session. */
   const handleLogout = () => {
     startTransition(async () => {
       await logoutAction();
@@ -60,17 +54,11 @@ export const AccountMenu = ({ user }: { user: User }) => {
       </Menu.Trigger>
 
       <Menu.Portal>
-        {/* Le `.dropdown` de la maquette : 8px sous la pastille, aligné sur son
-            bord droit. */}
         <Menu.Positioner side="bottom" align="end" sideOffset={8}>
           <Menu.Popup className="w-[270px] rounded-md border bg-popover p-1.5 shadow-float outline-none">
-            {/* `closeOnClick={false}` : le menu reste le temps de l'aller-retour
-                et porte l'attente, puis disparaît avec la pastille quand
-                l'en-tête repasse en visiteur.
-
-                `data-highlighted` et non `hover:` — Base UI pose cet attribut
-                au survol comme à la navigation au clavier, la flèche bas
-                surligne donc exactement comme la souris. */}
+            {/* `closeOnClick={false}` : le menu porte l'attente, puis disparaît
+                avec la pastille. `data-highlighted` et non `hover:` — Base UI
+                pose cet attribut au survol comme au clavier. */}
             <Menu.Item
               closeOnClick={false}
               disabled={pending}

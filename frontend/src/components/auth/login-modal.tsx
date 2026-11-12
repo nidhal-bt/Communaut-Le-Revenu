@@ -13,10 +13,7 @@ import { Input } from "@/components/ui/input";
 import { loginAction } from "@/lib/auth/actions";
 import { useSetUser } from "@/lib/auth/auth-context";
 
-/**
- * Les avantages mis en avant pour convaincre un visiteur de s'inscrire.
- * Partagés avec la carte du rail droit, pour que les deux ne divergent pas.
- */
+/** Partagés avec la carte du rail droit, pour que les deux ne divergent pas. */
 export const BENEFITS = [
   "Posez vos questions d'argent aux lecteurs et à la rédaction",
   "Suivez les discussions qui vous concernent",
@@ -35,12 +32,11 @@ export const LoginModal = ({ open, onOpenChange }: LoginModalProps) => {
 
   /**
    * Le formulaire n'est pas contrôlé : `loginAction` lit le `FormData`, pose le
-   * cookie de session côté serveur et renvoie le membre. Le mot de passe ne
-   * part donc jamais du navigateur vers Strapi.
+   * cookie côté serveur et renvoie le membre — le mot de passe ne part donc jamais
+   * du navigateur vers Strapi.
    *
-   * Appel impératif plutôt que `action={...}` : on a besoin de faire trois
-   * choses du résultat — afficher l'erreur, mettre le contexte à jour, fermer
-   * la modale — et aucune ne demande un effet.
+   * Appel impératif plutôt que `action={...}` : on fait trois choses du résultat,
+   * et aucune ne demande un effet.
    */
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -65,7 +61,6 @@ export const LoginModal = ({ open, onOpenChange }: LoginModalProps) => {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      {/* Largeur de la maquette : min(440px, 100%) dans une gouttière de 16px. */}
       <DialogContent
         showCloseButton={false}
         className="max-h-[calc(100dvh-32px)] max-w-[min(440px,calc(100%-2rem))] gap-0 overflow-auto p-0 sm:max-w-[min(440px,calc(100%-2rem))]"

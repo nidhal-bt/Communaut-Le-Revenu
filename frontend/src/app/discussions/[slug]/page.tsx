@@ -28,21 +28,14 @@ const excerpt = (content: string): string => {
 };
 
 /**
- * `fetchDiscussion` passe par `cache` de React : cette lecture, celle du corps
- * de la page et celle du bloc « À lire aussi » n'en font qu'une.
- *
- * Pas d'URL canonique : `metadataBase` n'est posé nulle part, une valeur
- * relative serait donc résolue contre `localhost`. Et pas de redirection quand
- * le slug ne correspond plus au titre — les deux adresses servent la même page,
- * l'identifiant seul faisant l'identité, et rediriger depuis le corps de la
- * page demanderait d'y attendre `params`, ce qui rendrait toute la route
- * bloquante.
- *
  * Le `try` ne couvre pas une discussion absente — `fetchDiscussion` renvoie `null`
- * pour ça — mais un backend injoignable. `next build` prérend la coquille de
- * la route, et `generateMetadata` n'est sous aucune frontière de Suspense :
- * sans ce filet, construire l'image frontend imposerait d'avoir déjà l'API
- * debout. Le vrai 404 reste décidé dans le corps de la page.
+ * pour ça — mais un backend injoignable : `generateMetadata` n'est sous aucune
+ * frontière `<Suspense>`, donc sans ce filet, construire l'image frontend
+ * imposerait d'avoir déjà l'API debout. Le vrai 404 reste décidé dans le corps.
+ *
+ * Pas d'URL canonique : `metadataBase` n'est posé nulle part, une valeur relative
+ * serait résolue contre `localhost`. Et pas de redirection quand le slug ne
+ * correspond plus au titre — l'identifiant seul fait l'identité.
  */
 export const generateMetadata = async ({
   params,
@@ -67,10 +60,9 @@ const DiscussionMain = async ({ params }: { params: DiscussionParams }) => {
   const { slug } = await params;
   const discussion = await fetchDiscussion(documentIdFromSlug(slug));
 
-  /* Un identifiant inconnu rend bien la page de 404, mais sous un statut 200 :
-     la coquille est déjà partie quand cette lecture aboutit. Soft 404 assumé,
-     comme pour un espace — tous les liens internes viennent de la base, donc
-     d'un identifiant valide. */
+  /* Un identifiant inconnu rend bien la page de 404, mais sous un statut 200 : la
+     coquille est déjà partie quand cette lecture aboutit. Soft 404 assumé — tous
+     les liens internes viennent de la base, donc d'un identifiant valide. */
   if (!discussion) notFound();
 
   return (
@@ -110,19 +102,14 @@ const RelatedSection = async ({ params }: { params: DiscussionParams }) => {
 };
 
 /**
- * Une discussion : son en-tête, son fil de réponses, puis trois lectures
- * voisines dans le même espace.
+ * Trois frontières sœurs plutôt qu'une seule : le fil ne dépend que de l'identifiant
+ * tiré de l'URL, et non de la lecture de la discussion — les deux circulent donc
+ * vraiment en parallèle. Le bloc « À lire aussi » a besoin de l'espace mais doit
+ * s'afficher *après* le fil, d'où une troisième frontière qui relit la discussion :
+ * même entrée de cache, dédoublonnée par `cache`.
  *
- * Trois frontières sœurs plutôt qu'une seule : le fil ne dépend que de
- * l'identifiant tiré de l'URL, et non de la lecture de la discussion — les deux
- * circulent donc vraiment en parallèle. Le bloc « À lire aussi » a besoin de
- * l'espace mais doit s'afficher *après* le fil, d'où une troisième frontière
- * qui relit la discussion : même entrée de cache, dédoublonnée par `cache`.
- *
- * `params` n'est pas attendu ici : ce serait une lecture de la requête, et
- * l'attendre dans le corps de la page la rendrait bloquante en entier. Chaque
- * enfant vit sous sa frontière et attend sa propre donnée, comme le fait la
- * page d'un espace.
+ * `params` n'est pas attendu ici : l'attendre dans le corps de la page la rendrait
+ * bloquante en entier.
  */
 export default function DiscussionPage({
   params,

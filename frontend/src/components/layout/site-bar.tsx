@@ -3,21 +3,17 @@ import { ArrowLeft, BookOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /**
- * Barre de liaison avec lerevenu.com, reprise du `#sitebar` de la maquette.
+ * Volontairement NON collante : elle défile hors de l'écran et laisse l'en-tête
+ * seul en haut.
  *
- * Volontairement NON collante : elle défile hors de l'écran et laisse
- * l'en-tête seul en haut au défilement.
- *
- * La pastille d'abonnement reste dans son état « S'abonner ». La maquette a un
- * second état pour les abonnés, mais `User` n'expose pas encore ce champ — à
- * brancher quand Strapi le servira. C'est ce qui permet à ce composant de
- * rester un composant serveur.
+ * La pastille d'abonnement reste dans son état « S'abonner » : la maquette a un
+ * second état pour les abonnés, mais `User` n'expose pas encore ce champ. C'est ce
+ * qui permet à ce composant de rester un composant serveur.
  */
 
 /** Tous les liens pointent vers l'accueil du site, comme dans la maquette. */
 export const SITE_URL = "https://www.lerevenu.com";
 
-/** Les rubriques du site, dans l'ordre de la maquette. */
 const RUBRIQUES = [
   "Bourse",
   "Économie",
@@ -56,7 +52,6 @@ export const SiteBar = () => (
         Retour sur lerevenu.com
       </SiteLink>
 
-      {/* Les rubriques sont rognées sur les écrans étroits, jamais passées à la ligne. */}
       <nav
         aria-label="Rubriques de lerevenu.com"
         className="flex min-w-0 gap-4 overflow-hidden border-l border-border-divider pl-5"

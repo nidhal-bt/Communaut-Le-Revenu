@@ -2,24 +2,17 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-/* ---------------------------------------------------------------------------
-   Design tokens derived from ../maquette-communaute-le-revenu.html (repo
-   root), which is the canonical design source. Two layers:
+/* Design tokens derived from ../maquette-communaute-le-revenu.html, the
+   canonical design source. Two layers: Palette, the only place a raw colour
+   literal appears, then Semantic, the roles components reference.
 
-     1. Palette  — the only place a raw colour literal appears.
-     2. Semantic — the roles components reference: shadcn's contract, plus the
-                   roles it does not ship (third text level, success,
-                   subscriber gold, verified blue, avatars, category spaces,
-                   glass bars, hero).
+   Components must never name a colour. Reach for a semantic token; if none fits,
+   add one here rather than hard-coding a value in a className.
 
-   Components must never name a colour. Reach for a semantic token; if none
-   fits, add one here rather than hard-coding a value in a className.
-
-   Single mode — there is no dark theme.
-   --------------------------------------------------------------------------- */
+   Single mode — there is no dark theme. */
 
 :root {
-  /* === Palette: brand (charte Le Revenu) =================================== */
+  /* Palette: brand (charte Le Revenu) */
   --rev-red: #eb0f0f; /* logo red; solid fills */
   --rev-red-hover: #d00d0d;
   --rev-red-text: #e00b0b; /* darker — holds contrast as text on white */
@@ -29,7 +22,7 @@
   --rev-black: #000000;
   --white: #ffffff;
 
-  /* === Palette: neutrals (macOS gray ramp) ================================ */
+  /* Palette: neutrals (macOS gray ramp) */
   --gray-50: #f5f5f7;
   --gray-100: #f2f2f4;
   --gray-200: #e5e5ea;
@@ -41,7 +34,7 @@
   --graphite-700: #3a3a3c;
   --graphite-900: #1c1c1e;
 
-  /* === Palette: alpha neutrals ============================================ */
+  /* Palette: alpha neutrals */
   --black-a05: rgb(0 0 0 / 0.05);
   --black-a07: rgb(0 0 0 / 0.07);
   --black-a08: rgb(0 0 0 / 0.08);
@@ -49,7 +42,7 @@
   --white-a72: rgb(255 255 255 / 0.72);
   --white-a86: rgb(255 255 255 / 0.86);
 
-  /* === Palette: accent hues =============================================== */
+  /* Palette: accent hues */
   --green-600: #1a8a4a;
   --green-tint: #e4f6ea;
   --gold-500: #c9a032;
@@ -57,10 +50,9 @@
   --violet-600: #4b48c9;
   --orange-500: #ff9f0a;
 
-  /* === Palette: shared hue family ========================================= */
-  /* Serves both avatar monograms and category tiles. The maquette kept two
-     separate lists that overlapped (#5856d6 appeared in both), so they are
-     one family here. */
+  /* Palette: shared hue family */
+  /* Avatars et pastilles d'espaces partagent la famille : la maquette tenait
+     deux listes qui se recouvraient (#5856d6 dans les deux). */
   --hue-blue: #007aff;
   --hue-slate: #3d5a80;
   --hue-green: #34c759;
@@ -75,7 +67,7 @@
   --hue-rust: #c93400;
   --hue-crimson: #d30f45;
 
-  /* === Semantic: shadcn contract ========================================== */
+  /* Semantic: shadcn contract */
   --background: var(--gray-50);
   --foreground: var(--gray-900);
   --card: var(--white);
@@ -97,7 +89,7 @@
   --ring: var(--rev-red);
   --radius: 14px;
 
-  /* === Semantic: extensions =============================================== */
+  /* Semantic: extensions */
 
   /* Text — the maquette has three levels where shadcn ships two. */
   --foreground-secondary: var(--gray-700);
@@ -180,7 +172,7 @@
   --sidebar-border: var(--border);
   --sidebar-ring: var(--ring);
 
-  /* === Gradients ========================================================== */
+  /* Gradients */
   /* Tailwind has no gradient theme namespace, so these stay plain properties
      and are surfaced through the @utility rules below. */
   --gradient-primary: linear-gradient(
@@ -195,8 +187,6 @@
       transparent 55%
     ),
     linear-gradient(160deg, var(--hero-top), var(--hero));
-  /* Carte d'inscription du rail droit : teinte rouge qui s'efface vers la
-     surface de la carte. */
   --gradient-join: linear-gradient(180deg, var(--primary-soft), var(--card) 70%);
 
   --gradient-progress: linear-gradient(

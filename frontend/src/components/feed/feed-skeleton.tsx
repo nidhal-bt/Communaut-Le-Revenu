@@ -5,10 +5,7 @@ import { FeedViewToggleSkeleton } from "./feed-view-toggle";
 
 const ROWS = [0, 1, 2, 3];
 
-/**
- * La liste seule, sans la barre d'onglets : c'est ce dont la recherche a
- * besoin, qui n'en porte aucune.
- */
+/** La liste seule, sans la barre d'onglets : ce dont la recherche a besoin. */
 export const FeedListSkeleton = () => (
   <div aria-hidden className={FEED_SHELL}>
     {ROWS.map((row) => (

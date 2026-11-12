@@ -10,28 +10,16 @@ import { categoryTag, HOME_FEED_TAG, topOfWeekTag } from "@/lib/strapi/tags";
 import type { Discussion, DiscussionType } from "@/types/models";
 import type { StrapiSingle } from "@/types/strapi";
 
-/**
- * Publier une discussion.
- *
- * Dans son propre module `"use server"`, pour la même raison que
- * `reply-actions.ts` : chaque export d'un tel module est une route HTTP
- * publique, et séparer les surfaces garde le rayon d'action de chacune lisible.
- */
 
 export type CreateDiscussionResult =
   | { discussion: Discussion }
   | { error: string };
 
-/* Les deux valeurs de l'enum du backend, répétées ici plutôt qu'importées de
-   `discussion-types.ts` : ce module-là porte les icônes de la modale, qu'une
-   action n'a aucune raison de tirer dans son graphe. */
+/* Les deux valeurs de l'enum du backend, répétées plutôt qu'importées de
+   `discussion-types.ts` : ce module-là porte les icônes de la modale. */
 const TYPES: readonly DiscussionType[] = ["question", "discussion"];
 
-/**
- * Les erreurs de champ du contrôleur arrivent déjà en français
- * (`backend/src/api/discussion/controllers/discussion.ts`) : on les relaie
- * plutôt que d'en réécrire d'autres.
- */
+/** Les erreurs de champ du contrôleur arrivent déjà en français : on les relaie. */
 const fieldError = (details: unknown): string | null => {
   const errors = (details as { errors?: Record<string, unknown> } | null)
     ?.errors;
@@ -44,10 +32,7 @@ const fieldError = (details: unknown): string | null => {
   return typeof message === "string" ? message : null;
 };
 
-/**
- * Le 401 et le 403 ne sont pas relayés : la couche de permissions répond avant
- * le contrôleur, et en anglais.
- */
+/** 401 et 403 ne sont pas relayés : les permissions répondent avant le contrôleur, en anglais. */
 const messageFor = (error: unknown): string => {
   if (error instanceof NotAuthenticatedError) {
     return "Vous devez être connecté pour publier.";
@@ -84,9 +69,8 @@ export const createDiscussionAction = async (
   const type = String(formData.get("type") ?? "");
   const category = String(formData.get("category") ?? "");
 
-  /* La modale porte déjà ces contraintes, mais une action est une route
-     publique : elle revalide ce qu'elle reçoit. Les bornes du titre et le
-     caractère obligatoire du contenu sont celles du contrôleur. */
+  /* La modale porte déjà ces contraintes, mais une action est une route publique :
+     elle revalide ce qu'elle reçoit. Les bornes sont celles du contrôleur. */
   if (title.length < 10) {
     return { error: "Le titre doit contenir au moins 10 caractères." };
   }
@@ -104,29 +88,25 @@ export const createDiscussionAction = async (
       "/discussions",
       {
         method: "POST",
-        /* `author` et `replyCount` sont posés par le contrôleur : les envoyer
-           d'ici laisserait croire que le client peut en décider. */
+        /* `author` et `replyCount` sont posés par le contrôleur. */
         body: { data: { title, content, type, category } },
       },
     );
 
-    /* Les deux seules surfaces où la discussion apparaît : le fil de l'accueil
-       et son espace — dont le compteur « discussions » vient aussi de bouger.
-       Sa propre page n'est pas nommée : elle vient de naître, aucune lecture
-       mise en cache ne la connaît. Le contrôleur peuple `category`, le slug
-       est donc là sans seconde requête. */
+    /* Les deux seules surfaces où la discussion apparaît : le fil de l'accueil et
+       son espace. Sa propre page n'est pas nommée — elle vient de naître, aucune
+       lecture mise en cache ne la connaît. */
     updateTag(HOME_FEED_TAG);
 
-    /* Et le classement du rail droit de son type : la publication est la plus
-       récente de la semaine, elle gagne donc tous les ex æquo à son nombre de
-       réponses. Le type a été validé contre `TYPES` plus haut. */
+    /* La publication est la plus récente de la semaine : elle gagne tous les ex
+       aequo du classement de son type. */
     updateTag(topOfWeekTag(type as DiscussionType));
 
     const slug = data.category?.slug;
     if (slug) updateTag(categoryTag(slug));
 
-    /* Puis le routeur client, que `updateTag` ne touche pas : sans lui, il
-       rejouerait la charge qu'il détient déjà. */
+    /* Le routeur client, que `updateTag` ne touche pas : sans lui, il rejouerait
+       la charge qu'il détient déjà. */
     refresh();
 
     return { discussion: data };

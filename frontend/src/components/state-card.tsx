@@ -1,16 +1,12 @@
 import { cn } from "@/lib/utils";
 
 /**
- * La `.card.empty` de la maquette : une carte centrée qui annonce un état —
- * rien à afficher, page introuvable, lecture échouée.
- *
  * Sans directive : les pages serveur (`not-found.tsx`, un fil vide) comme les
  * frontières client (`error.tsx`) l'utilisent.
  */
 type StateCardProps = {
   title: string;
   description: string;
-  /** Pastille ronde au-dessus du titre. Absente sur un simple état vide. */
   icon?: React.ReactNode;
   action?: React.ReactNode;
   className?: string;
