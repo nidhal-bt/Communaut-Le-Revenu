@@ -92,12 +92,14 @@ const sortAndFiltersForTab = (
     case "recentes":
       return { sort: ["createdAt:desc"] };
 
-    /* `replyCount` est à `null` tant qu'aucune réponse n'a été écrite : `$eq: 0`
-       seul raterait les discussions les plus anciennes sans réponse. */
+    /* `replyCount` peut valoir `null` sur une ligne écrite avant la colonne, quel
+       que soit le `default: 0` du schéma : `$eq: 0` seul raterait ces lignes. */
     case "sans-reponse":
       return {
         sort: ["createdAt:desc"],
-        filters: { replyCount: { $eq: 0 } },
+        filters: {
+          $or: [{ replyCount: { $eq: 0 } }, { replyCount: { $null: true } }],
+        },
       };
   }
 };
