@@ -42,6 +42,7 @@ const NavbarActions = ({
     return (
       <>
         <PublishButton label="Publier" categories={use(categories)} />
+        {/* Emplacement : aucune source de notifications n'existe encore. */}
         <button
           type="button"
           aria-label="Notifications"

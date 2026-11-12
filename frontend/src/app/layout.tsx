@@ -53,7 +53,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             <main className="min-w-0 md:col-start-2">{children}</main>
             <RightRail className="md:max-wide:col-start-2" />
           </div>
-          <BottomNav />
+          <BottomNav categories={fetchCategories()} />
           {/* Les deux décalages portent la même valeur : la barre du bas est fixée
               jusqu'à `md` (768px) alors que sonner bascule sur `mobileOffset` à
               600px — un seul des deux laisserait la notification sous la barre. */}

@@ -1,19 +1,14 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, use, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  Bell,
-  House,
-  LayoutGrid,
-  Plus,
-  User,
-  type LucideIcon,
-} from "lucide-react";
+import { Bell, House, LayoutGrid, Plus, User, type LucideIcon } from "lucide-react";
 import { LoginModal } from "@/components/auth/login-modal";
+import { ComposerTrigger } from "@/components/composer/composer-trigger";
 import { useAuth } from "@/lib/auth/auth-context";
 import { cn } from "@/lib/utils";
+import type { Category } from "@/types/models";
 
 /**
  * Affichée seulement sur mobile ; le `pb-24` de la grille du layout dégage sa
@@ -27,6 +22,9 @@ const LINKS = [
 
 const CELL =
   "flex min-w-[56px] flex-col items-center gap-0.5 px-2 py-1 text-[11px] text-muted-foreground";
+
+const FAB =
+  "-mt-[18px] grid size-12 flex-none place-items-center rounded-full bg-gradient-primary text-primary-foreground shadow-brand";
 
 type CellLink = { href: string; label: string; icon: LucideIcon };
 
@@ -60,6 +58,27 @@ const NavCell = (props: CellLink) => (
   </Suspense>
 );
 
+/**
+ * Ce bouton porte la publication sous `md`, où les raccourcis de la barre de
+ * l'accueil disparaissent.
+ */
+const PublishCell = ({ categories }: { categories: Promise<Category[]> }) => (
+  <ComposerTrigger categories={use(categories)}>
+    {(openComposer) => (
+      <button
+        type="button"
+        aria-label="Publier"
+        onClick={() => openComposer()}
+        className={FAB}
+      >
+        <Plus className="size-6" />
+      </button>
+    )}
+  </ComposerTrigger>
+);
+
+const PublishCellSkeleton = () => <span aria-hidden className={FAB} />;
+
 /** Les isoler évite que `useAuth` retienne les liens et le bouton de publication. */
 const AccountCells = () => {
   const { isAuth } = useAuth();
@@ -68,7 +87,7 @@ const AccountCells = () => {
 
   return (
     <>
-      {/* Pas de badge de non-lus : aucune source de notifications. */}
+      {/* Emplacement : aucune source de notifications n'existe encore. */}
       <button
         type="button"
         className={CELL}
@@ -78,12 +97,8 @@ const AccountCells = () => {
         Activité
       </button>
 
-      {isAuth ? (
-        <Link href="#" className={CELL}>
-          <User className="size-[18px] flex-none" />
-          Profil
-        </Link>
-      ) : (
+      {/* Pas de cellule « Profil » : le menu de compte vit dans l'en-tête. */}
+      {!isAuth && (
         <button type="button" className={CELL} onClick={openLogin}>
           <User className="size-[18px] flex-none" />
           Connexion
@@ -106,7 +121,11 @@ const AccountCellsSkeleton = () => (
   </>
 );
 
-export const BottomNav = () => (
+export const BottomNav = ({
+  categories,
+}: {
+  categories: Promise<Category[]>;
+}) => (
   <nav
     aria-label="Navigation mobile"
     className="fixed inset-x-0 bottom-0 z-[45] flex items-center justify-around border-t bg-glass px-2 pt-1.5 pb-[calc(0.375rem+env(safe-area-inset-bottom,0px))] backdrop-blur-xl backdrop-saturate-[1.8] md:hidden"
@@ -115,15 +134,9 @@ export const BottomNav = () => (
       <NavCell key={link.label} {...link} />
     ))}
 
-    {/* Présentationnel : aucun flux de publication n'existe encore, comme
-        le bouton « Publier » de l'en-tête. */}
-    <button
-      type="button"
-      aria-label="Publier"
-      className="-mt-[18px] grid size-12 place-items-center rounded-full bg-gradient-primary text-primary-foreground shadow-brand"
-    >
-      <Plus className="size-6" />
-    </button>
+    <Suspense fallback={<PublishCellSkeleton />}>
+      <PublishCell categories={categories} />
+    </Suspense>
 
     <Suspense fallback={<AccountCellsSkeleton />}>
       <AccountCells />
