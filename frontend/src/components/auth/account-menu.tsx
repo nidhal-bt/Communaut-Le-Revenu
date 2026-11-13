@@ -3,12 +3,12 @@
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Menu } from "@base-ui/react/menu";
-import { LogOut } from "lucide-react";
+import { LogOut, User as UserIcon } from "lucide-react";
+import { Avatar } from "@/components/avatar";
 import { logoutAction } from "@/lib/auth/actions";
 import { useSetUser } from "@/lib/auth/auth-context";
+import { cn } from "@/lib/utils";
 import type { User } from "@/types/models";
-
-const initial = (username: string) => username.trim().charAt(0).toUpperCase();
 
 /**
  * Un seul article : le `meMenu()` de la maquette en porte six autres qui n'ont
@@ -19,7 +19,17 @@ const initial = (username: string) => username.trim().charAt(0).toUpperCase();
  * et un écouteur de clic : la fermeture sur `Échap` et au clic dehors, le focus
  * rendu au déclencheur et la navigation aux flèches viennent avec.
  */
-export const AccountMenu = ({ user }: { user: User }) => {
+const LogoutMenu = ({
+  side,
+  align,
+  trigger,
+  children,
+}: {
+  side: "top" | "bottom";
+  align: "center" | "end";
+  trigger: React.ReactElement<Record<string, unknown>>;
+  children: React.ReactNode;
+}) => {
   const setUser = useSetUser();
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -36,28 +46,13 @@ export const AccountMenu = ({ user }: { user: User }) => {
 
   return (
     <Menu.Root>
-      <Menu.Trigger
-        render={
-          <button
-            type="button"
-            aria-label="Mon compte"
-            className="flex items-center gap-2 rounded-full border bg-card py-[3px] pr-2.5 pl-[3px] shadow-lift hover:bg-secondary"
-          />
-        }
-      >
-        <span className="grid size-[30px] place-items-center rounded-full bg-avatar-5 text-[11.5px] font-semibold text-primary-foreground">
-          {initial(user.username)}
-        </span>
-        <span className="text-[12.5px] font-semibold text-foreground-secondary">
-          {user.username}
-        </span>
-      </Menu.Trigger>
+      <Menu.Trigger render={trigger}>{children}</Menu.Trigger>
 
       <Menu.Portal>
-        <Menu.Positioner side="bottom" align="end" sideOffset={8}>
+        <Menu.Positioner side={side} align={align} sideOffset={8}>
           <Menu.Popup className="w-[270px] rounded-md border bg-popover p-1.5 shadow-float outline-none">
             {/* `closeOnClick={false}` : le menu porte l'attente, puis disparaît
-                avec la pastille. `data-highlighted` et non `hover:` — Base UI
+                avec son déclencheur. `data-highlighted` et non `hover:` — Base UI
                 pose cet attribut au survol comme au clavier. */}
             <Menu.Item
               closeOnClick={false}
@@ -74,3 +69,46 @@ export const AccountMenu = ({ user }: { user: User }) => {
     </Menu.Root>
   );
 };
+
+/** Le pseudo tombe sous `md` : à 360px la pastille n'est plus que le monogramme. */
+export const AccountMenu = ({ user }: { user: User }) => (
+  <LogoutMenu
+    side="bottom"
+    align="end"
+    trigger={
+      <button
+        type="button"
+        aria-label="Mon compte"
+        className="flex items-center gap-2 rounded-full border bg-card p-[3px] shadow-lift hover:bg-secondary md:pr-2.5"
+      />
+    }
+  >
+    <Avatar username={user.username} size="sm" />
+    <span className="hidden text-[12.5px] font-semibold text-foreground-secondary md:inline">
+      {user.username}
+    </span>
+  </LogoutMenu>
+);
+
+/**
+ * La même sortie de session pour la barre du bas, qui ne porte pas la pastille :
+ * sans elle, un membre sur mobile n'a aucun moyen de se déconnecter.
+ */
+export const AccountMenuCell = ({ className }: { className: string }) => (
+  <LogoutMenu
+    side="top"
+    align="center"
+    trigger={
+      <button
+        type="button"
+        className={cn(
+          className,
+          "aria-expanded:font-semibold aria-expanded:text-primary-text",
+        )}
+      />
+    }
+  >
+    <UserIcon className="size-[18px] flex-none" />
+    Profil
+  </LogoutMenu>
+);

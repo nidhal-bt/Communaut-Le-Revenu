@@ -4,6 +4,7 @@ import { Suspense, use, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Bell, House, LayoutGrid, Plus, User, type LucideIcon } from "lucide-react";
+import { AccountMenuCell } from "@/components/auth/account-menu";
 import { LoginModal } from "@/components/auth/login-modal";
 import { ComposerTrigger } from "@/components/composer/composer-trigger";
 import { useAuth } from "@/lib/auth/auth-context";
@@ -24,7 +25,7 @@ const CELL =
   "flex min-w-[56px] flex-col items-center gap-0.5 px-2 py-1 text-[11px] text-muted-foreground";
 
 const FAB =
-  "-mt-[18px] grid size-12 flex-none place-items-center rounded-full bg-gradient-primary text-primary-foreground shadow-brand";
+  "-mt-[18px] grid size-12 flex-none place-items-center rounded-full bg-gradient-primary text-primary-foreground shadow-brand cursor-pointer";
 
 type CellLink = { href: string; label: string; icon: LucideIcon };
 
@@ -97,8 +98,12 @@ const AccountCells = () => {
         Activité
       </button>
 
-      {/* Pas de cellule « Profil » : le menu de compte vit dans l'en-tête. */}
-      {!isAuth && (
+      {/* Aucune route `/profil` n'existe : la cellule ouvre le menu de compte au
+          lieu de naviguer. C'est la seule sortie de session sous `md`, l'en-tête
+          qui porte la pastille étant masqué. */}
+      {isAuth ? (
+        <AccountMenuCell className={CELL} />
+      ) : (
         <button type="button" className={CELL} onClick={openLogin}>
           <User className="size-[18px] flex-none" />
           Connexion

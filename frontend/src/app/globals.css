@@ -289,6 +289,10 @@
      breakpoint en px sort avant md: (48rem) et se fait écraser par lui. */
   --breakpoint-wide: 73.8125rem;
 
+  /* 53.75rem = 860px : au-dessous, la maquette masque le champ de recherche et
+     le CTA principal de l'en-tête. En rem pour la raison ci-dessus. */
+  --breakpoint-search: 53.75rem;
+
   /* Typography — system first, matching the maquette's body stack. Inter is
      the cross-platform fallback; Playfair Display carries the headings. */
   --font-sans:
