@@ -3,6 +3,7 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { redirect, usePathname, useSearchParams } from "next/navigation";
+import { ScrollRail } from "@/components/scroll-rail";
 import { useAuth } from "@/lib/auth/auth-context";
 import {
   DEFAULT_FEED_TAB,
@@ -35,13 +36,15 @@ const TabLink = ({ tab, href, selected }: TabLinkProps) => {
     <Link
       href={href}
       aria-current={selected ? "page" : undefined}
+      aria-label={label}
+      title={label}
       className={cn(
-        "inline-flex items-center gap-[7px] rounded-sm px-3.5 py-1.5 text-sm font-medium whitespace-nowrap text-foreground-secondary transition-[background-color,box-shadow,color] hover:text-foreground",
+        "inline-flex items-center gap-[7px] rounded-sm px-3 py-1.5 text-sm font-medium whitespace-nowrap text-foreground-secondary transition-[background-color,box-shadow,color] hover:text-foreground sm:px-3.5",
         selected && cn(SEGMENT_SELECTED, "font-semibold"),
       )}
     >
       <Icon className="size-[18px] flex-none" />
-      {label}
+      <span className="hidden sm:inline">{label}</span>
     </Link>
   );
 };
@@ -95,12 +98,10 @@ export const FeedTabs = ({ category }: { category?: string }) => {
     feedHref(pathname, searchParams, { tab: key });
 
   return (
-    <nav
-      aria-label="Tri du fil"
-      className={cn(
-        "inline-flex max-w-full self-start overflow-x-auto [scrollbar-width:none]",
-        SEGMENT_RAIL,
-      )}
+    <ScrollRail
+      label="Tri du fil"
+      className={cn("inline-flex max-w-full self-start", SEGMENT_RAIL)}
+      trackClassName="gap-0.5"
     >
       <Suspense fallback={null}>
         <MemberTabs
@@ -118,13 +119,13 @@ export const FeedTabs = ({ category }: { category?: string }) => {
           selected={tab.key === activeTab}
         />
       ))}
-    </nav>
+    </ScrollRail>
   );
 };
 
 export const FeedTabsSkeleton = () => (
   <span
     aria-hidden
-    className="h-[38px] w-[340px] max-w-full rounded-md bg-accent"
+    className="h-[38px] w-[170px] max-w-full rounded-md bg-accent sm:w-[340px]"
   />
 );

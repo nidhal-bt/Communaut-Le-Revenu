@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
+import { ScrollRail } from "@/components/scroll-rail";
 import { SpaceTile } from "@/components/space-tile";
 import { feedHref } from "@/lib/feed-url";
 import { cn } from "@/lib/utils";
@@ -13,8 +14,6 @@ const CHIP =
 const CHIP_SELECTED =
   "border-primary bg-surface-brand font-semibold text-primary-text";
 
-const RAIL = "flex gap-2 overflow-x-auto [scrollbar-width:none]";
-
 /** L'espace actif se lit dans l'URL : une adresse partagée rouvre le même fil. */
 export const CategoryFilter = ({ categories }: { categories: Category[] }) => {
   const pathname = usePathname();
@@ -25,7 +24,11 @@ export const CategoryFilter = ({ categories }: { categories: Category[] }) => {
     feedHref(pathname, searchParams, { category: slug });
 
   return (
-    <nav aria-label="Filtrer par espace" className={RAIL}>
+    <ScrollRail
+      label="Filtrer par espace"
+      className="gap-2"
+      trackClassName="gap-2"
+    >
       <Link
         href={hrefFor("")}
         aria-current={active === "" ? "page" : undefined}
@@ -45,12 +48,12 @@ export const CategoryFilter = ({ categories }: { categories: Category[] }) => {
           {category.name}
         </Link>
       ))}
-    </nav>
+    </ScrollRail>
   );
 };
 
 export const CategoryFilterSkeleton = () => (
-  <div aria-hidden className={RAIL}>
+  <div aria-hidden className="no-scrollbar flex gap-2 overflow-x-auto">
     {[112, 148, 132, 96, 140].map((width, index) => (
       <span
         key={index}
@@ -60,3 +63,4 @@ export const CategoryFilterSkeleton = () => (
     ))}
   </div>
 );
+

@@ -354,6 +354,15 @@
   );
 }
 
+/* Hides the bar on a horizontal rail; scroll-rail.tsx supplies the arrows
+   instead. scrollbar-width alone leaves WebKit's bar showing. */
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
