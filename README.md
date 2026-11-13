@@ -10,8 +10,8 @@ Pas de `package.json` à la racine : toutes les commandes se lancent depuis l'un
 Prérequis : **Node 22**, **Docker**, **npm**.
 
 ```sh
-git clone <url-du-depot>
-cd "Communauté Le Revenu"
+git clone https://github.com/nidhal-bt/Communaut-Le-Revenu
+cd "Communaut-Le-Revenu"
 
 cp backend/.env.example backend/.env
 cp frontend/.env.example frontend/.env
