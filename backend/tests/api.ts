@@ -8,8 +8,8 @@
 
 const BASE_URL = process.env.TEST_API_URL ?? 'http://localhost:1337';
 
-/** Mot de passe partagé des comptes de démonstration, posé par `scripts/seeders/users.ts`. */
-const SEED_PASSWORD = process.env.TEST_SEED_PASSWORD ?? 'Password123!';
+/** Mot de passe partagé des comptes de démonstration, porté par `data/users.json`. */
+const SEED_PASSWORD = process.env.TEST_SEED_PASSWORD ?? 'password';
 
 const DEMO_EMAILS = [
   'vincent@demo.fr',

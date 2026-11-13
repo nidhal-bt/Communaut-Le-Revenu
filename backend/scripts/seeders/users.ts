@@ -1,9 +1,7 @@
 import type { Core } from '@strapi/strapi';
 import readData from './read-data';
 
-type User = { username: string; email: string };
-
-const PASSWORD = 'Password123!';
+type User = { username: string; email: string; password: string };
 
 export default async function seedUsers(strapi: Core.Strapi) {
   const items = await readData<User>(strapi, 'users.json');
@@ -33,7 +31,6 @@ export default async function seedUsers(strapi: Core.Strapi) {
     result.push(
       await strapi.plugin('users-permissions').service('user').add({
         ...data,
-        password: PASSWORD,
         provider: 'local',
         confirmed: true,
         blocked: false,
@@ -42,6 +39,6 @@ export default async function seedUsers(strapi: Core.Strapi) {
     );
   }
 
-  console.log(`Utilisateurs : ${result.length} (mot de passe : ${PASSWORD})`);
+  console.log(`Utilisateurs : ${result.length} (mot de passe : voir data/users.json)`);
   return result;
 }

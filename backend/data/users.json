@@ -1,10 +1,10 @@
 [
-  { "username": "Vincent", "email": "vincent@demo.fr" },
-  { "username": "Odile", "email": "odile@demo.fr" },
-  { "username": "Camille", "email": "camille@demo.fr" },
-  { "username": "Karim", "email": "karim@demo.fr" },
-  { "username": "Nadia", "email": "nadia@demo.fr" },
-  { "username": "Thomas", "email": "thomas@demo.fr" },
-  { "username": "Julie", "email": "julie@demo.fr" },
-  { "username": "Bruno", "email": "bruno@demo.fr" }
+  { "username": "Vincent", "email": "vincent@demo.fr", "password": "password" },
+  { "username": "Odile", "email": "odile@demo.fr", "password": "password" },
+  { "username": "Camille", "email": "camille@demo.fr", "password": "password" },
+  { "username": "Karim", "email": "karim@demo.fr", "password": "password" },
+  { "username": "Nadia", "email": "nadia@demo.fr", "password": "password" },
+  { "username": "Thomas", "email": "thomas@demo.fr", "password": "password" },
+  { "username": "Julie", "email": "julie@demo.fr", "password": "password" },
+  { "username": "Bruno", "email": "bruno@demo.fr", "password": "password" }
 ]
