@@ -93,10 +93,6 @@ export const DiscussionCard = ({ discussion }: { discussion: Discussion }) => {
               Nouveau
             </span>
           )}
-
-          <span className="ml-auto text-[12.5px] text-muted-foreground md:hidden">
-            {replyCount} rép.
-          </span>
         </div>
 
         <h3 className="font-heading text-[18.5px] leading-[1.3] font-bold tracking-[-0.01em] group-hover:text-primary-text">
